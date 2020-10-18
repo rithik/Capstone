@@ -1,5 +1,6 @@
 from graphene import relay, ObjectType, Mutation, String, Field, List, ID
 from graphene_django import DjangoObjectType
+from graphene_django.filter import DjangoFilterConnectionField
 
 from .models import User, Group, Message
 import datetime
@@ -8,18 +9,21 @@ class UserNode(DjangoObjectType):
     class Meta: 
         model = User
         fields = "__all__"
+        filter_fields = ['username', 'publicKey']
         interfaces = (relay.Node,)
 
 class GroupNode(DjangoObjectType):
     class Meta:
         model = Group
         fields = "__all__"
+        filter_fields = ['name', 'publicKey', 'gid']
         interfaces = (relay.Node,)
 
 class MessageNode(DjangoObjectType):
     class Meta: 
         model = Message
         fields = "__all__"
+        filter_fields = ['content']
         interfaces = (relay.Node,)
 
 class UserConnection(relay.Connection):
@@ -27,7 +31,7 @@ class UserConnection(relay.Connection):
         node = UserNode
 
 class MainQuery(ObjectType):
-    users = relay.ConnectionField(UserConnection)
+    users = DjangoFilterConnectionField(UserNode)
 
     def resolve_users(root, info, **kwargs):
         return User.objects.all()
