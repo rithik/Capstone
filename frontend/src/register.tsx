@@ -16,6 +16,8 @@ function Register() {
 				value={myUsernameValue}
 				onChange={(e) => setUsernameValue(e.target.value)} 
 			/>
+			<br/>
+			<br/>
 			<Button onClick={(e) => generateKeys(myUsernameValue, e)} variant="contained" color="primary">
 			  Register
 			</Button>
