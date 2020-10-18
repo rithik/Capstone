@@ -11,15 +11,17 @@ import {
 import { ApolloClient, InMemoryCache, createHttpLink, ApolloProvider } from '@apollo/client';
 import ChatMain from './components/ChatMain.react';
 import { setContext } from '@apollo/client/link/context';
+import { split } from '@apollo/client';
+import { getMainDefinition } from '@apollo/client/utilities';
+import { WebSocketLink } from '@apollo/client/link/ws';
 
 function App() {
-
+  const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXI0IiwicHVibGljS2V5IjoicGs1IiwiaWF0IjoxNjAyOTA4MzcxfQ.0NE-nScEZStrxA4ZC78QAjBfKp7Jl5HegutjZgER9ww";
   const httpLink = createHttpLink({
     uri: 'http://localhost:4000/graphql',
   });
 
   const authLink = setContext((_, { headers }) => {
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXI0IiwicHVibGljS2V5IjoicGs1IiwiaWF0IjoxNjAyOTA4MzcxfQ.0NE-nScEZStrxA4ZC78QAjBfKp7Jl5HegutjZgER9ww";
     return {
       headers: {
         ...headers,
@@ -28,8 +30,30 @@ function App() {
     }
   });
   
+  const wsLink = new WebSocketLink({
+    uri: `ws://localhost:4000/graphql`,
+    options: {
+      reconnect: true,
+      connectionParams: {
+        Authorization: token,
+      },
+    }
+  });
+  
+  const splitLink = split(
+    ({ query }) => {
+      const definition = getMainDefinition(query);
+      return (
+        definition.kind === 'OperationDefinition' &&
+        definition.operation === 'subscription'
+      );
+    },
+    wsLink,
+    authLink.concat(httpLink),
+  );
+
   const client = new ApolloClient({
-    link: authLink.concat(httpLink),
+    link: splitLink,
     cache: new InMemoryCache()
   });
 

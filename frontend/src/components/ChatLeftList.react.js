@@ -17,7 +17,7 @@ const GET_GROUPS = gql`
   }
 `;
 
-function ChatLeftList() {
+function ChatLeftList({ selectedGroup, setSelectedGroup, setDoneFetching }) {
   const {
     loading,
     error,
@@ -27,7 +27,6 @@ function ChatLeftList() {
       username: "user4"
     }
   });
-  const [selected, setSelected] = useState(0);
 
   if (loading) return 'Loading...';
   if (error) return `Error! ${error.message}`;
@@ -35,8 +34,8 @@ function ChatLeftList() {
   const groupDivs = data.groupsByUser.map(group => {
     const users = group.users.map(username => `@${username}`);
     return (
-      <div key={group.id} onClick={() => setSelected(group.id)}>
-        <ChatListItem active={group.id === selected}>
+      <div key={group.id} onClick={() => {setSelectedGroup(group.id); setDoneFetching(false)}}>
+        <ChatListItem active={group.id === selectedGroup}>
           <Avatar letter={group.name.charAt(0).toUpperCase()} />
           <Column fill>
             <Row justify>

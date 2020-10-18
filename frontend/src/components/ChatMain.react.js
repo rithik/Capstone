@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ChatLeftList from './ChatLeftList.react';
 import ChatMessages from './ChatMessages.react';
 import './../App.css';
@@ -67,6 +67,8 @@ const themes = {
 }
 
 function ChatMain() {
+    const [selectedGroup, setSelectedGroup] = useState(null);
+    const [doneFetching, setDoneFetching] = useState(false)
     return (<ThemeProvider theme={themes.defaultTheme}>
         <div style={{
             height: "100%",
@@ -78,7 +80,7 @@ function ChatMain() {
             paddingTop: '20px',
             left: 0
         }}>
-            <ChatLeftList>
+            <ChatLeftList selectedGroup={selectedGroup} setSelectedGroup={setSelectedGroup} setDoneFetching={setDoneFetching}>
             </ChatLeftList>
         </div>
 
@@ -90,10 +92,12 @@ function ChatMain() {
             top: 0,
             overflowX: 'hidden',
             paddingTop: '20px',
-            right: 0, 
-            border: "1px solid rgba(0,0,0,0.1)", 
+            right: 0,
+            border: "1px solid rgba(0,0,0,0.1)",
         }}>
-            <ChatMessages></ChatMessages>
+            {
+                selectedGroup && <ChatMessages selectedGroup={selectedGroup} doneFetching={doneFetching} setDoneFetching={setDoneFetching}></ChatMessages>
+            }
         </div>
 
     </ThemeProvider>);

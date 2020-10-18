@@ -8,27 +8,39 @@ import {
 import ChatFeed from './ChatFeed.react';
 
 const GET_MESSAGES = gql`
-  query getMessagesForGroup($gid: Int!, $offset: Int, $limit: Int) {
-    messagesByGroup(gid: $gid, count: $limit, offset: $offset){
-      id
-      content
-      ts
-      sender
+    query getMessagesForGroup($gid: Int!, $offset: Int, $limit: Int) {
+        messagesByGroup(gid: $gid, count: $limit, offset: $offset){
+            id
+            content
+            ts
+            sender
+        }
     }
-  }
 `;
 
-function ChatLeftList() {
-    const [doneFetching, setDoneFetching] = useState(false)
-    const { loading, error, data, fetchMore } = useQuery(
+const MESSAGE_SUBSCRIPTION = gql`
+    subscription getNewMessages($gid: Int!){
+        newMessage(gid: $gid){
+            id
+            content
+            ts
+            sender
+        }
+    }
+`;
+
+function ChatMessages({
+    selectedGroup, doneFetching, setDoneFetching
+}) {
+    const { subscribeToMore, loading, error, data, fetchMore } = useQuery(
         GET_MESSAGES,
         {
             variables: {
-                gid: 13,
+                gid: selectedGroup,
                 offset: 0,
                 limit: 2
             },
-            fetchPolicy: "cache"
+            fetchPolicy: "cache-and-network"
         }
     );
 
@@ -52,9 +64,22 @@ function ChatLeftList() {
                 });
             }
         })
-    }
-    }>
+    }}
+        subscribeToNewMessages={() =>
+            subscribeToMore({
+                document: MESSAGE_SUBSCRIPTION,
+                variables: { gid: selectedGroup },
+                updateQuery: (prev, { subscriptionData }) => {
+                    if (!subscriptionData.data) return prev;
+                    const newFeedItem = subscriptionData.data.newMessage;
+                    return Object.assign({}, prev, {
+                        messagesByGroup: [newFeedItem, ...prev.messagesByGroup]
+                    });
+                }
+            })
+        }
+    >
     </ChatFeed>;
 }
 
-export default ChatLeftList;
+export default ChatMessages;

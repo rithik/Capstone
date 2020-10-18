@@ -14,7 +14,8 @@ const override = css`
 function ChatFeed({
     entries,
     onLoadMore, 
-    doneFetching
+    doneFetching,
+    subscribeToNewMessages
 }) {
     const [firstLoad, setFirstLoad] = useState(true);
     let messagesEndRef = React.createRef();
@@ -28,6 +29,7 @@ function ChatFeed({
     useEffect(() => {
         if (firstLoad) {
             messagesEndRef.scrollIntoView({ behavior: "smooth" });
+            subscribeToNewMessages();
         }
         setInterval(() => {
             const offset = 0;
