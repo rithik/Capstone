@@ -30,6 +30,7 @@ function ChatFeed({
         if (firstLoad) {
             messagesEndRef.scrollIntoView({ behavior: "smooth" });
             subscribeToNewMessages();
+            setFirstLoad(false);
         }
         setInterval(() => {
             const offset = 0;
@@ -40,7 +41,6 @@ function ChatFeed({
                 onLoadMore();
             }
         }, 1000);
-        setFirstLoad(false);
     }, [firstLoad, setFirstLoad, onLoadMore, messagesStartRef, messagesEndRef]);
     console.log(entries);
     return <div style={{ marginLeft: '10px', marginRight: '10px' }}>

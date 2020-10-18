@@ -191,16 +191,17 @@ const resolvers = {
             const dbMessage = Message.build(newMessage);
             await dbMessage.save();
             const channel_name = `MESSAGE_GID_${args.group}`;
-            pubsub.publish(channel_name, {
-                newMessage
-            });
-            return {
+            const returnMessage = {
                 id: dbMessage.dataValues.id,
                 content: dbMessage.dataValues.content,
                 group: dbMessage.dataValues.groupId,
-                sender: dbMessage.dataValues.userId,
+                sender: args.sender,
                 ts: dbMessage.dataValues.createdAt
             };
+            pubsub.publish(channel_name, {
+                newMessage: returnMessage
+            });
+            return returnMessage;
         },
     },
     Subscription: {
