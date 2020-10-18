@@ -94,7 +94,11 @@ const resolvers = {
             } = context;
             const _ = verifyToken(token);
             const gid = args.gid;
+            console.log(args);
             const params = {
+                order: [
+                    ['createdAt', 'DESC'],
+                ],
                 where: {
                     groupId: gid, 
                     createdAt: {
@@ -103,10 +107,10 @@ const resolvers = {
                     }
                 },
                 offset: args.offset ? args.offset : 0,
-                limit: args.count ? args.count : 10
+                limit: args.count ? args.count : 10,
             };
-            const messages = await Message.findAll(params);
-            return await messages.map(async message => {
+            const messages = await Message.findAndCountAll(params);
+            const messagesGraphQL = await messages.rows.map(async message => {
                 const user = await User.findOne({
                     where: {
                         id: message.dataValues.userId
@@ -120,6 +124,7 @@ const resolvers = {
                     ts: message.dataValues.createdAt
                 }
             });
+            return messagesGraphQL;
         },
     },
     Mutation: {

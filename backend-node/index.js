@@ -4,6 +4,7 @@ const {
     gql
 } = require('apollo-server-express');
 const http = require("http");
+var cors = require("cors");
 
 const typeDefs = require('./typeDefs');
 const resolvers = require('./resolvers');
@@ -44,6 +45,8 @@ const server = new ApolloServer({
 });
 
 const app = express();
+app.use(cors());
+
 server.applyMiddleware({
     app
 });

@@ -29,6 +29,11 @@ const typeDefs = gql `
         ts: String!
     }
 
+    type MessageOut {
+        count: Int
+        messages: [Message]
+    }
+
     type Query {
         allUsers: [User]
         user(username: String!): User
