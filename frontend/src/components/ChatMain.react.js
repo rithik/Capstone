@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import ChatLeftList from './ChatLeftList.react';
 import ChatMessages from './ChatMessages.react';
 import './../App.css';
+import Modal from './Modal.react'
+import useModal from './useModal';
 
 import { ThemeProvider, darkTheme, elegantTheme, purpleTheme, defaultTheme } from '@livechat/ui-kit'
 
@@ -69,6 +71,8 @@ const themes = {
 function ChatMain() {
     const [selectedGroup, setSelectedGroup] = useState(null);
     const [doneFetching, setDoneFetching] = useState(false)
+    const {isShowing, toggle} = useModal();
+
     return (<ThemeProvider theme={themes.defaultTheme}>
         <div style={{
             height: "100%",
@@ -80,6 +84,13 @@ function ChatMain() {
             paddingTop: '20px',
             left: 0
         }}>
+        <div className="App">
+				<button className="button-default" onClick={toggle}>Create Group Chat</button>
+				<Modal
+					isShowing={isShowing}
+					hide={toggle}
+				/>
+		</div>
             <ChatLeftList selectedGroup={selectedGroup} setSelectedGroup={setSelectedGroup} setDoneFetching={setDoneFetching}>
             </ChatLeftList>
         </div>
@@ -99,6 +110,7 @@ function ChatMain() {
                 selectedGroup && <ChatMessages selectedGroup={selectedGroup} doneFetching={doneFetching} setDoneFetching={setDoneFetching}></ChatMessages>
             }
         </div>
+        
 
     </ThemeProvider>);
 }

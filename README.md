@@ -18,7 +18,14 @@ node index
 
 To run frontend, run the following commands:
 
-```bash
-cd frontend
-npm start
-```
+- NPM: 
+    ```bash
+    cd frontend
+    npm start
+    ```
+
+- Yarn:
+    ```bash
+    cd frontend
+    yarn 
+    ```

@@ -4,9 +4,8 @@ import generateKeys from '../utils/generateKeys'
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField'
 
-
 function Register() {
-	const [myUsernameValue, setUsernameValue] = useState('') 
+	const [myUsernameValue, setUsernameValue] = useState('');
 	return (
 		<div className="Register">
 			<TextField 
