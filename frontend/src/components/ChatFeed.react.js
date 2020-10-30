@@ -5,7 +5,7 @@ import { ChatFeed as ChatFeedUI, Message } from 'react-chat-ui';
 import ClipLoader from "react-spinners/ClipLoader";
 import { css } from "@emotion/core";
 import { gql, useMutation } from '@apollo/client';
-import 'bootstrap/dist/css/bootstrap.min.css';
+// import 'bootstrap/dist/css/bootstrap.min.css';
 
 
 const override = css`
