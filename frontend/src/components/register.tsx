@@ -1,9 +1,9 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import './../App.css';
 import generateKeys from '../utils/generateKeys'
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField'
-import {setCookie, getCookie, deleteCookie} from '../utils/cookieManager'
+import { setCookie, getCookie, deleteCookie } from '../utils/cookieManager'
 import { gql, useMutation } from '@apollo/client';
 
 
@@ -29,42 +29,40 @@ const CREATE_TOKEN = gql`
 function Register() {
 	const [createUser] = useMutation(CREATE_USER);
 	const [createToken] = useMutation(CREATE_TOKEN, {
-	    onCompleted({ token, username }) {
-	      localStorage.setItem('token', token as string);
-	      localStorage.setItem('username', username as string);
-	    }
+		onCompleted({ createToken }) {
+			localStorage.setItem('token', createToken.token as string);
+			localStorage.setItem('username', createToken.username as string);
+		}
 	});
 	const [myUsernameValue, setUsernameValue] = useState('');
 
 	function sendData(myUsernameValue: any) {
 		const x = Promise.resolve(generateKeys(myUsernameValue)).then(function (array) {
-				const publicKey = array.publicKey
-				const privateKey = array.privateKey
-				console.log(myUsernameValue)
-				console.log(publicKey)
-				console.log(privateKey)
-				createUser({ variables: { username: myUsernameValue, publicKey: publicKey } });
-				createToken({ variables: { username: myUsernameValue, publicKey: publicKey } });
-				localStorage.setItem('user-privateKey', privateKey as string);
-        });
+			const publicKey = array.publicKey
+			const privateKey = array.privateKey
+			createUser({ variables: { username: myUsernameValue, publicKey: publicKey } });
+			createToken({ variables: { username: myUsernameValue, publicKey: publicKey } });
+			localStorage.setItem('user-privateKey', privateKey as string);
+			window.location.href = 'http://localhost:3000/main';
+		});
 	}
 
 	return (
 		<div className="Register">
-			<TextField 
-				InputProps={{style: {color: "white"} }} 
-				id="outlined-basic" label="Username" 
-				variant="outlined" 
+			<TextField
+				InputProps={{ style: { color: "white" } }}
+				id="outlined-basic" label="Username"
+				variant="outlined"
 				value={myUsernameValue}
-				onChange={(e) => setUsernameValue(e.target.value)} 
+				onChange={(e) => setUsernameValue(e.target.value)}
 			/>
-			<br/>
-			<br/>
+			<br />
+			<br />
 			<Button onClick={(e) => {
-				e.preventDefault(); 
+				e.preventDefault();
 				sendData(myUsernameValue);
 			}} variant="contained" color="primary">
-			  Register
+				Register
 			</Button>
 		</div>
 	);

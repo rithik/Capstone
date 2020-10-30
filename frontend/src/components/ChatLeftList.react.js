@@ -18,13 +18,14 @@ const GET_GROUPS = gql`
 `;
 
 function ChatLeftList({ selectedGroup, setSelectedGroup, setDoneFetching }) {
+  const username = localStorage.getItem('username');
   const {
     loading,
     error,
     data
   } = useQuery(GET_GROUPS, {
     variables: {
-      username: "user4"
+      username
     }
   });
 

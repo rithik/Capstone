@@ -23,8 +23,9 @@ function ChatFeed({
 
     window.lm = onLoadMore;
     const reversedEntries = [].concat(entries.messagesByGroup).reverse();
+    const username = localStorage.getItem('username');
     const messages = reversedEntries.map(message => {
-        return new Message({ id: message.sender === 'user4' ? 0 : message.sender, message: message.content, senderName: `@${message.sender}` })
+        return new Message({ id: message.sender === username ? 0 : message.sender, message: message.content, senderName: `@${message.sender}` })
     })
     useEffect(() => {
         if (firstLoad) {
