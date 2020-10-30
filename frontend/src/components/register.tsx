@@ -32,6 +32,7 @@ function Register() {
 		onCompleted({ createToken }) {
 			localStorage.setItem('token', createToken.token as string);
 			localStorage.setItem('username', createToken.username as string);
+			window.location.href = 'http://localhost:3000/main';
 		}
 	});
 	const [myUsernameValue, setUsernameValue] = useState('');
@@ -41,9 +42,8 @@ function Register() {
 			const publicKey = array.publicKey
 			const privateKey = array.privateKey
 			createUser({ variables: { username: myUsernameValue, publicKey: publicKey } });
-			createToken({ variables: { username: myUsernameValue, publicKey: publicKey } });
 			localStorage.setItem('user-privateKey', privateKey as string);
-			window.location.href = 'http://localhost:3000/main';
+			createToken({ variables: { username: myUsernameValue, publicKey: publicKey } });
 		});
 	}
 
