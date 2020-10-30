@@ -1,10 +1,12 @@
-import React, { useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import Form from 'react-bootstrap/Form';
 import FormGroup from 'react-bootstrap/FormGroup';
 import { ChatFeed as ChatFeedUI, Message } from 'react-chat-ui';
 import ClipLoader from "react-spinners/ClipLoader";
 import { css } from "@emotion/core";
 import { gql, useMutation } from '@apollo/client';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 
 const override = css`
   display: block;
@@ -13,18 +15,16 @@ const override = css`
 `;
 const SEND_MESSAGE = gql`
     mutation SendMessage($username: String!, $content: String!, $gid: Int!){
-           mutation{
-                createMessage(sender:$username, group:$gid, content:$content){
-                    id
-                    content
-                    ts
-                }
-            }
+        createMessage(sender:$username, group:$gid, content:$content){
+            id
+            content
+            ts
+        }
     }
 `;
 function ChatFeed({
     entries,
-    onLoadMore, 
+    onLoadMore,
     doneFetching,
     subscribeToNewMessages,
     selectedGroup
@@ -58,7 +58,7 @@ function ChatFeed({
         }, 1000);
     }, [firstLoad, setFirstLoad, onLoadMore, messagesStartRef, messagesEndRef]);
     console.log(entries);
-    return <div style={{ marginLeft: '10px', marginRight: '10px' , marginBottom:'50px'}}>
+    return <div style={{ marginLeft: '10px', marginRight: '10px', marginBottom: '50px' }}>
         <div style={{ height: '30px' }}
             ref={(el) => { messagesStartRef = el; }}>
             {
@@ -89,15 +89,15 @@ function ChatFeed({
         <div style={{ float: "left", clear: "both" }}
             ref={(el) => { messagesEndRef = el; }}>
         </div>
-        <Form style={{paddingBotttom:"10%", width:"100%"}}>
+        <Form style={{ width: "75vw", bottom: "20px", position: "fixed" }}>
             <Form.Group>
-                <Form.Control type="text" placeholder="Enter message" value={messageInput} onChange={e => setMessageInput(e.target.value)} onKeyPress={event => {
-                if (event.key === 'Enter') {
-                    event.preventDefault()
-                    console.log(messageInput);
-                    createMessage({ variables: { username: "user4", gid: selectedGroup, content: messageInput } });
-                }
-              }}/>
+                <Form.Control style={{width:"90%", borderRadius: "15px"}} type="text" placeholder="Enter message" value={messageInput} onChange={e => setMessageInput(e.target.value)} onKeyPress={event => {
+                    if (event.key === 'Enter') {
+                        event.preventDefault()
+                        console.log(messageInput);
+                        createMessage({ variables: { username: "test2", gid: selectedGroup, content: messageInput } });
+                    }
+                }} />
             </Form.Group>
         </Form>
     </div>;
