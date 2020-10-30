@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './../App.css';
-import generateKeys from '../utils/generateKeys'
+import {generateKeys} from '../utils/generateKeys'
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField'
 import { setCookie, getCookie, deleteCookie } from '../utils/cookieManager'

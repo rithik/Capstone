@@ -1,5 +1,5 @@
 import '../App.css';
-import {setCookie, getCookie, deleteCookie} from './cookieManager'
+import { setCookie, getCookie, deleteCookie } from './cookieManager'
 
 function ab2str(buf: any) {
     return String.fromCharCode.apply(null, Array.from(new Uint8Array(buf)));
@@ -28,14 +28,13 @@ async function exportCryptoPrivateKey(key: any) {
 }
 
 
-async function generateKeys(username: string){
-    console.log("Register Button Clicked")
+export async function generateKeys(username: string) {
     const response = await window.crypto.subtle.generateKey({
-            name: "RSA-OAEP",
-            modulusLength: 4096,
-            publicExponent: new Uint8Array([1, 0, 1]),
-            hash: "SHA-256",
-        },
+        name: "RSA-OAEP",
+        modulusLength: 4096,
+        publicExponent: new Uint8Array([1, 0, 1]),
+        hash: "SHA-256",
+    },
         true,
         ["encrypt", "decrypt"]
     ).then(async (keyPair) => {
@@ -43,11 +42,35 @@ async function generateKeys(username: string){
         const privateKey = await exportCryptoPrivateKey(keyPair.privateKey);
         return {
             privateKey,
-            username, 
+            username,
             publicKey
         }
     });
     return response;
 }
 
-export default generateKeys;
+
+export async function generateGroupKeys(username: string) {
+    const response = await window.crypto.subtle.generateKey({
+        name: "RSA-OAEP",
+        modulusLength: 256,
+        publicExponent: new Uint8Array([1, 0, 1]),
+        hash: "SHA-256",
+    },
+        true,
+        ["encrypt", "decrypt"]
+    ).then(async (keyPair) => {
+        const publicKey = await exportCryptoPublicKey(keyPair.publicKey);
+        const privateKey = await exportCryptoPrivateKey(keyPair.privateKey);
+        return {
+            privateKey,
+            username,
+            publicKey
+        }
+    });
+    return {
+        publicKey: "edsfdsfsd",
+        username, 
+        privateKey: "abc"
+    };
+};

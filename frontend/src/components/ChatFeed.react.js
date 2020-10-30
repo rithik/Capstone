@@ -5,9 +5,8 @@ import { ChatFeed as ChatFeedUI, Message } from 'react-chat-ui';
 import ClipLoader from "react-spinners/ClipLoader";
 import { css } from "@emotion/core";
 import { gql, useMutation } from '@apollo/client';
-import JSEncrypt from 'jsencrypt';
-import CryptoJS from "crypto-js";
-import 'bootstrap/dist/css/bootstrap.min.css';
+// import 'bootstrap/dist/css/bootstrap.min.css';
+import {encryptMessage, decryptMessage, decryptMessageForPrivateKey} from '../utils/AESEncryption';
 
 
 const override = css`
@@ -16,29 +15,14 @@ const override = css`
   border-color: red;
 `;
 const SEND_MESSAGE = gql`
-    mutation SendMessage($username: String!, $content: String!, $gid: Int!){
-        createMessage(sender:$username, group:$gid, content:$content){
+    mutation SendMessage($username: String!, $content: String!, $gid: Int!, $cType: String!){
+        createMessage(sender:$username, group:$gid, content:$content, cType:$cType){
             id
             content
             ts
         }
     }
 `;
-
-function encryptMessage(message, type){
-    var messageJSON = {"message": message, "type":type}
-    var messageString = JSON.stringify(messageJSON);
-    const groupPrivateKey = localStorage.getItem('user-privateKey');
-    const encrypted = CryptoJS.AES.encrypt(messageString, groupPrivateKey).toString();
-    return encrypted;
-}
-
-function decryptMessage(message){
-    const groupPrivateKey = localStorage.getItem('user-privateKey');
-    const decrypt = CryptoJS.AES.decrypt(message, groupPrivateKey);
-    return decrypt.toString(CryptoJS.enc.Utf8);
-}
-
 
 function ChatFeed({
     entries,
@@ -57,8 +41,18 @@ function ChatFeed({
     const reversedEntries = [].concat(entries.messagesByGroup).reverse();
     const username = localStorage.getItem('username');
     const messages = reversedEntries.map(message => {
-        return new Message({ id: message.sender === username ? 0 : message.sender, message: decryptMessage(message.content), senderName: `@${message.sender}` })
-    })
+        if (message.cType.includes("group-private-key")){
+            if (message.cType.includes(username)){
+                if (localStorage.getItem(`${selectedGroup}-privateKey`) == null){
+                    const messageContent = decryptMessageForPrivateKey(message.content);
+                    localStorage.setItem(`${selectedGroup}-privateKey`, messageContent.message);
+                }
+            }
+            return null;
+        }
+        return new Message({ id: message.sender === username ? 0 : message.sender, message: decryptMessage(message.content, selectedGroup).message, senderName: `@${message.sender}` })
+    }).filter(Boolean);
+
     useEffect(() => {
         if (firstLoad) {
             messagesEndRef.scrollIntoView({ behavior: "smooth" });
@@ -111,7 +105,7 @@ function ChatFeed({
                 <Form.Control type="text" placeholder="Enter message" value={messageInput} onChange={e => setMessageInput(e.target.value)} onKeyPress={event => {
                 if (event.key === 'Enter') {
                     event.preventDefault()
-                    createMessage({ variables: { username: "user4", gid: selectedGroup, content: encryptMessage(messageInput, "text") } });
+                    createMessage({ variables: { username, gid: selectedGroup, content: encryptMessage(messageInput, "text", selectedGroup), cType: "text" } });
                 }
               }}/>
             </Form.Group>

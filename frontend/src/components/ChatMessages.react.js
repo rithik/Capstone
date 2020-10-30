@@ -14,6 +14,7 @@ const GET_MESSAGES = gql`
             content
             ts
             sender
+            cType
         }
     }
 `;
@@ -25,6 +26,7 @@ const MESSAGE_SUBSCRIPTION = gql`
             content
             ts
             sender
+            cType
         }
     }
 `;
@@ -43,7 +45,6 @@ function ChatMessages({
             fetchPolicy: "cache-and-network"
         }
     );
-
     if (loading) return 'Loading...';
     if (error) return `Error! ${error.message}`;
     return <ChatFeed entries={data} selectedGroup={selectedGroup} doneFetching={doneFetching} onLoadMore={() => {
