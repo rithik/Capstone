@@ -38,7 +38,7 @@ function ChatMessages({
             variables: {
                 gid: selectedGroup,
                 offset: 0,
-                limit: 2
+                limit: 50
             },
             fetchPolicy: "cache-and-network"
         }
@@ -46,7 +46,7 @@ function ChatMessages({
 
     if (loading) return 'Loading...';
     if (error) return `Error! ${error.message}`;
-    return <ChatFeed entries={data} doneFetching={doneFetching} onLoadMore={() => {
+    return <ChatFeed entries={data} selectedGroup={selectedGroup} doneFetching={doneFetching} onLoadMore={() => {
         if (doneFetching) {
             return;
         }

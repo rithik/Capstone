@@ -184,6 +184,7 @@ const resolvers = {
             return returnObj;
         },
         async createMessage(parent, args, context) {
+            console.log("Create message")
             const {
                 token
             } = context;
@@ -200,6 +201,7 @@ const resolvers = {
             };
             const dbMessage = Message.build(newMessage);
             await dbMessage.save();
+            console.log(dbMessage);
             const channel_name = `MESSAGE_GID_${args.group}`;
             const returnMessage = {
                 id: dbMessage.dataValues.id,
