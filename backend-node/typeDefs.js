@@ -35,6 +35,7 @@ const typeDefs = gql `
         group: ID!
         sender: ID!
         ts: String!
+        cType: String!  
     }
 
     type MessageOut {
@@ -72,6 +73,7 @@ const typeDefs = gql `
             content: String!
             group: Int!, 
             sender: String!,
+            cType: String!
         ): Message
     }
 

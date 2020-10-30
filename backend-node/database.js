@@ -28,6 +28,9 @@ const MessageModel = db.define('message', {
     content: {
         type: Sequelize.STRING
     },
+    cType: {
+        type: Sequelize.STRING
+    }
 });
 
 const UserGroupModel = db.define('user_groups', {

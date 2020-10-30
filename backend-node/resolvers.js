@@ -121,7 +121,8 @@ const resolvers = {
                     content: message.dataValues.content,
                     group: message.dataValues.groupId,
                     sender: user.dataValues.username,
-                    ts: message.dataValues.createdAt
+                    ts: message.dataValues.createdAt, 
+                    cType: message.dataValues.cType
                 }
             });
             return messagesGraphQL;
@@ -198,6 +199,7 @@ const resolvers = {
                 content: args.content,
                 groupId: args.group,
                 userId: user.dataValues.id,
+                cType: args.cType
             };
             const dbMessage = Message.build(newMessage);
             await dbMessage.save();
@@ -208,7 +210,8 @@ const resolvers = {
                 content: dbMessage.dataValues.content,
                 group: dbMessage.dataValues.groupId,
                 sender: args.sender,
-                ts: dbMessage.dataValues.createdAt
+                ts: dbMessage.dataValues.createdAt, 
+                cType: args.cType
             };
             pubsub.publish(channel_name, {
                 newMessage: returnMessage
