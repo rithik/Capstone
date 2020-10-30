@@ -6,7 +6,7 @@ import ClipLoader from "react-spinners/ClipLoader";
 import { css } from "@emotion/core";
 import { gql, useMutation } from '@apollo/client';
 import JSEncrypt from 'jsencrypt';
-import 'bootstrap/dist/css/bootstrap.min.css';
+// import 'bootstrap/dist/css/bootstrap.min.css';
 
 
 const override = css`
@@ -45,9 +45,10 @@ function chunk(s, maxBytes) {
 function encryptMessage(message, type){
     var message_to_encrypt_json = {"message": message, "type":type}
     var message_to_encrypt_string = JSON.stringify(message_to_encrypt_json);
-    var chunks = chunk(message_to_encrypt_string, 256);
+    var chunks = chunk(message_to_encrypt_string, 500);
+    console.log(chunks);
     var crypt = new JSEncrypt();
-    var publicKey = '-----BEGIN PUBLIC KEY-----MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDlOJu6TyygqxfWT7eLtGDwajtNFOb9I5XRb6khyfD1Yt3YiCgQWMNW649887VGJiGr/L5i2osbl8C9+WJTeucF+S76xFxdU6jE0NQ+Z+zEdhUTooNRaY5nZiu5PgDB0ED/ZKBUSLKL7eibMxZtMlUDHjm4gwQco1KRMDSmXSMkDwIDAQAB-----END PUBLIC KEY-----'
+    var publicKey = "-----BEGIN PUBLIC KEY-----MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAweyAiCo+w3Gxbdj72kPWYm36buUIbkTLHhnhni7nGcp53Rui8paKqr6VIRtJBKqwSOvNz2EqBkikGA5Knj4kQWlihqOJ3clTvk/Di+TnBAiNxUikxb4lOrLR15LZ1+1i1RCZXd1dTCqqvuddiPLMLbo8FG+ppvxBrlWQXNOY+8/7sQJuJpHdneweZuyD9KVeUJgHzBl3gseMaKGB21CUzeXYQYR49wbZem7+fKJEPnQqWZrdxui13YLTJ+FzFDUusSYTUgzBDHBUZwlBb4uo5cct5gyhFqO9Lk5RyNL3ei/+gIdQCDWW7TL91L1FM8ICqnWtTfHKwN1qz/1zUa6scEkJO8SPUY3qQaPJy3pYWYxD87ItW22RL+zCEA3Qy/XwgTHxBV+rET5V8cTDzLlF9WiDSYbW60YtxahDiedMTkmB3CwJVc8oidGLtAxIGWBIzes9HTRjLtNlVBM8D5uSRbz515LLRnEp98RSt7S2L0EjNhD4NsWYL7vHNQPeYaIiDUdMKox8hX9q360S+uE3shksETwwrshZdcafagRUZmTfipuetlTWrOlolbGwajA2iUq4VeMEzJNOI0A8Oe2oLEZZNtNVDvXrL8LNsLXj5cIdRoEMOm0JD892SrdU/Jx6tJQNrZ+agpkn9wppdKvqAqrmIBEl3bnLCmwXOAA8PU0CAwEAAQ==-----END PUBLIC KEY-----";
     crypt.setPublicKey(publicKey);
     var enc_text = "";
     for(var i = 0; i < chunks.length; i++){
@@ -138,7 +139,6 @@ function ChatFeed({
                 <Form.Control type="text" placeholder="Enter message" value={messageInput} onChange={e => setMessageInput(e.target.value)} onKeyPress={event => {
                 if (event.key === 'Enter') {
                     event.preventDefault()
-                    console.log(messageInput);
                     createMessage({ variables: { username: "user4", gid: selectedGroup, content: encryptMessage(messageInput, "text") } });
                 }
               }}/>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {
   gql,
@@ -12,14 +12,32 @@ const GET_GROUPS = gql`
     groupsByUser(username: $username){
       id
       name
-      users
+      users {
+        username
+      }
     }
   }
 `;
 
+const GROUP_SUBSCRIPTION = gql`
+    subscription getNewGroups($username: String!){
+        newGroup(username: $username){
+          id
+          users{
+            username
+          }
+          name
+          publicKey
+        }
+    }
+`;
+
 function ChatLeftList({ selectedGroup, setSelectedGroup, setDoneFetching }) {
   const username = localStorage.getItem('username');
+  const [firstLoad, setFirstLoad] = useState(false);
+
   const {
+    subscribeToMore,
     loading,
     error,
     data
@@ -29,13 +47,35 @@ function ChatLeftList({ selectedGroup, setSelectedGroup, setDoneFetching }) {
     }
   });
 
+  const subscribeToNewMessages = () => {
+    subscribeToMore({
+      document: GROUP_SUBSCRIPTION,
+      variables: { username },
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData.data) return prev;
+        const newGroup = subscriptionData.data.newGroup;
+        return Object.assign({}, prev, {
+          groupsByUser: [newGroup, ...prev.groupsByUser]
+        });
+      }
+    })
+  };
+
+  useEffect(() => {
+    if (!firstLoad){
+      setFirstLoad(true);
+      subscribeToNewMessages();
+    }
+  }, [firstLoad]);
+
+
   if (loading) return 'Loading...';
   if (error) return `Error! ${error.message}`;
 
   const groupDivs = data.groupsByUser.map(group => {
-    const users = group.users.map(username => `@${username}`);
+    const users = group.users.map(user => `@${user.username}`);
     return (
-      <div key={group.id} onClick={() => {setSelectedGroup(group.id); setDoneFetching(false)}}>
+      <div key={group.id} onClick={() => { setSelectedGroup(group.id); setDoneFetching(false) }}>
         <ChatListItem active={group.id === selectedGroup}>
           <Avatar letter={group.name.charAt(0).toUpperCase()} />
           <Column fill>

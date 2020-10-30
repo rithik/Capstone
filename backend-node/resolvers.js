@@ -283,11 +283,12 @@ const getGroupsForUser = async (group_ids) => {
             }
         })
         const user_usernames = await getUsersById(users);
+        const userObjs = await getUsersByUsernames(user_usernames);
         return {
             id: groupObj.dataValues.id,
             name: groupObj.dataValues.name,
             publicKey: groupObj.dataValues.publicKey,
-            users: user_usernames
+            users: userObjs
         }
     }));
 }

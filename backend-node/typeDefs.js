@@ -16,7 +16,7 @@ const typeDefs = gql `
 
     type Group {
         id: Int!
-        users: [ID!]
+        users: [UserOut!]
         name: String!
         publicKey: String!
     }
@@ -77,7 +77,7 @@ const typeDefs = gql `
 
     type Subscription {
         newMessage(gid: Int!): Message
-        newGroup(uid: Int!): GroupOut
+        newGroup(username: String!): GroupOut
     }
 `;
 
