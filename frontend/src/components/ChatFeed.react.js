@@ -24,13 +24,35 @@ const SEND_MESSAGE = gql`
     }
 `;
 
+
+// https://stackoverflow.com/questions/57068850/how-to-split-a-string-into-chunks-of-a-particular-byte-size
+function chunk(s, maxBytes) {
+    let buf = Buffer.from(s);
+    const result = [];
+    while (buf.length) {
+        let i = buf.lastIndexOf(32, maxBytes+1);
+        // If no space found, try forward search
+        if (i < 0) i = buf.indexOf(32, maxBytes);
+        // If there's no space at all, take the whole string
+        if (i < 0) i = buf.length;
+        // This is a safe cut-off point; never half-way a multi-byte
+        result.push(buf.slice(0, i).toString());
+        buf = buf.slice(i+1); // Skip space (if any)
+    }
+    return result;
+}
+
 function encryptMessage(message, type){
     var message_to_encrypt_json = {"message": message, "type":type}
     var message_to_encrypt_string = JSON.stringify(message_to_encrypt_json);
+    var chunks = chunk(message_to_encrypt_string, 256);
     var crypt = new JSEncrypt();
-    var publicKey = 'abc123'
+    var publicKey = '-----BEGIN PUBLIC KEY-----MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDlOJu6TyygqxfWT7eLtGDwajtNFOb9I5XRb6khyfD1Yt3YiCgQWMNW649887VGJiGr/L5i2osbl8C9+WJTeucF+S76xFxdU6jE0NQ+Z+zEdhUTooNRaY5nZiu5PgDB0ED/ZKBUSLKL7eibMxZtMlUDHjm4gwQco1KRMDSmXSMkDwIDAQAB-----END PUBLIC KEY-----'
     crypt.setPublicKey(publicKey);
-    var enc_text = crypt.encrypt(message_to_encrypt_string);
+    var enc_text = "";
+    for(var i = 0; i < chunks.length; i++){
+        enc_text += crypt.encrypt(chunks[i]);
+    }
     return enc_text
 }
 
@@ -117,7 +139,7 @@ function ChatFeed({
                 if (event.key === 'Enter') {
                     event.preventDefault()
                     console.log(messageInput);
-                    createMessage({ variables: { username: "user4", gid: selectedGroup, content: encryptMessage(messageInput) } });
+                    createMessage({ variables: { username: "user4", gid: selectedGroup, content: encryptMessage(messageInput, "text") } });
                 }
               }}/>
             </Form.Group>
