@@ -67,11 +67,13 @@ function App() {
           </ApolloProvider>
         </Route>
         <Route path="/">
+        <ApolloProvider client={client}>
           <div className="App">
             <header className="App-header">
               <Register />
             </header>
           </div>
+         </ApolloProvider>
         </Route>
       </Switch>
     </Router>

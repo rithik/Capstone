@@ -148,6 +148,8 @@ const resolvers = {
             };
             const dbUser = User.build(newUser);
             await dbUser.save();
+            //debugging
+            console.log('dbuser', dbUser);
             return {
                 id: dbUser.dataValues.id,
                 username: dbUser.dataValues.username,

@@ -28,27 +28,26 @@ async function exportCryptoPrivateKey(key: any) {
 }
 
 
-function generateKeys(username: string, e: any){
-	e.preventDefault()
-	console.log("Register Button Clicked")
-	window.crypto.subtle.generateKey({
-	        name: "RSA-OAEP",
-	        modulusLength: 4096,
-	        publicExponent: new Uint8Array([1, 0, 1]),
-	        hash: "SHA-256",
-	    },
-	    true,
-	    ["encrypt", "decrypt"]
-	).then(async (keyPair) => {
-	    const publicKey = await exportCryptoPublicKey(keyPair.publicKey);
-	    const privateKey = await exportCryptoPrivateKey(keyPair.privateKey);
-	    console.log(publicKey)
-
-
-	    setCookie('privateKey', privateKey, null)
-	    console.log(username)
-	    console.log(getCookie('privateKey'))
-	});
+async function generateKeys(username: string){
+    console.log("Register Button Clicked")
+    const response = await window.crypto.subtle.generateKey({
+            name: "RSA-OAEP",
+            modulusLength: 4096,
+            publicExponent: new Uint8Array([1, 0, 1]),
+            hash: "SHA-256",
+        },
+        true,
+        ["encrypt", "decrypt"]
+    ).then(async (keyPair) => {
+        const publicKey = await exportCryptoPublicKey(keyPair.publicKey);
+        const privateKey = await exportCryptoPrivateKey(keyPair.privateKey);
+        return {
+            privateKey,
+            username, 
+            publicKey
+        }
+    });
+    return response;
 }
 
 export default generateKeys;
