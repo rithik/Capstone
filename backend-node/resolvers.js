@@ -100,7 +100,7 @@ const resolvers = {
                     ['createdAt', 'DESC'],
                 ],
                 where: {
-                    groupId: gid, 
+                    groupId: gid,
                     createdAt: {
                         [Op.gt]: args.after ? new Date(Number(args.after)) : new Date(0),
                         [Op.lt]: args.before ? new Date(Number(args.before)) : new Date(),
@@ -166,12 +166,20 @@ const resolvers = {
             const dbGroup = Group.build(newGroup);
             await dbGroup.save();
             const setupUsers = await addUserstoGroup(args.users, dbGroup.dataValues.id);
-            return {
+            const userObjs = await getUsersByUsernames(args.users);
+            const returnObj = {
                 id: dbGroup.dataValues.id,
                 name: dbGroup.dataValues.name,
                 publicKey: dbGroup.dataValues.publicKey,
-                users: args.users,
+                users: userObjs,
             };
+            args.users.map(username => {
+                const channel_name = `NEW_GROUP_${username}`;
+                pubsub.publish(channel_name, {
+                    newGroup: returnObj
+                });
+            });
+            return returnObj;
         },
         async createMessage(parent, args, context) {
             const {
@@ -207,6 +215,9 @@ const resolvers = {
     Subscription: {
         newMessage: {
             subscribe: (parent, args, context, info) => pubsub.asyncIterator([`MESSAGE_GID_${args.gid}`])
+        },
+        newGroup: {
+            subscribe: (parent, args, context, info) => pubsub.asyncIterator([`NEW_GROUP_${args.username}`])
         },
     },
 };
@@ -274,6 +285,20 @@ const getGroupsForUser = async (group_ids) => {
             publicKey: groupObj.dataValues.publicKey,
             users: user_usernames
         }
+    }));
+}
+
+const getUsersByUsernames = async (users) => {
+    return Promise.all(users.map(async user => {
+        const userObj = await User.findOne({
+            where: {
+                username: user
+            }
+        });
+        return {
+            username: userObj.dataValues.username,
+            publicKey: userObj.dataValues.publicKey
+        };
     }));
 }
 

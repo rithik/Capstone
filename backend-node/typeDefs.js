@@ -21,6 +21,14 @@ const typeDefs = gql `
         publicKey: String!
     }
     
+    type GroupOut {
+        id: Int!
+        users: [UserOut!]
+        name: String!
+        publicKey: String!
+    }
+    
+
     type Message {
         id: Int!
         content: String!
@@ -32,6 +40,11 @@ const typeDefs = gql `
     type MessageOut {
         count: Int
         messages: [Message]
+    }
+
+    type UserOut {
+        username: String!
+        publicKey: String!
     }
 
     type Query {
@@ -54,7 +67,7 @@ const typeDefs = gql `
             name: String!
             users: [String!], 
             publicKey: String!,
-        ): Group
+        ): GroupOut
         createMessage( 
             content: String!
             group: Int!, 
@@ -64,6 +77,7 @@ const typeDefs = gql `
 
     type Subscription {
         newMessage(gid: Int!): Message
+        newGroup(uid: Int!): GroupOut
     }
 `;
 
