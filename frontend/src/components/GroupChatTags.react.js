@@ -58,9 +58,13 @@ function GroupChatTags({ show, setShow }) {
         }
     });
 
-    const createGroupChat = (tags, groupName) => {
+    const createGroupChat = (raw_tags, groupName) => {
+        raw_tags.push(localStorage.getItem('username')) // transparently include current user in every group they create
+        function onlyUnique(value, index, self) {
+            return self.indexOf(value) === index;
+        }
+        var tags = raw_tags.filter(onlyUnique);
         if (tags && tags.length > 0) {
-
             const x = Promise.resolve(generateGroupKeys(groupName)).then(function (array) {
                 const publicKey = array.publicKey
                 const privateKey = array.privateKey
@@ -94,10 +98,10 @@ function GroupChatTags({ show, setShow }) {
                 <Modal.Footer>
                     <Button variant="secondary" onClick={handleClose}>
                         Close
-          </Button>
-                    <Button variant="primary" onClick={() => createGroupChat(tags, groupName)}>
-                        Create Group!
-          </Button>
+                    </Button>
+                        <Button variant="primary" onClick={() => createGroupChat(tags, groupName)}>
+                            Create Group!
+                    </Button>
                 </Modal.Footer>
             </Modal>
         </div>);
