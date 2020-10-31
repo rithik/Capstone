@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import Form from 'react-bootstrap/Form';
-import FormGroup from 'react-bootstrap/FormGroup';
 import { ChatFeed as ChatFeedUI, Message } from 'react-chat-ui';
 import ClipLoader from "react-spinners/ClipLoader";
 import { css } from "@emotion/core";
 import { gql, useMutation } from '@apollo/client';
-// import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import {encryptMessage, decryptMessage, decryptMessageForPrivateKey} from '../utils/AESEncryption';
 
 
@@ -100,7 +99,7 @@ function ChatFeed({
         <div style={{ float: "left", clear: "both" }}
             ref={(el) => { messagesEndRef = el; }}>
         </div>
-        <Form style={{ width: "75vw", bottom: "20px", position: "fixed" }}>
+        <Form style={{ width: "68%", bottom: "20px", position: "fixed" }}>
             <Form.Group>
                 <Form.Control type="text" placeholder="Enter message" value={messageInput} onChange={e => setMessageInput(e.target.value)} onKeyPress={event => {
                 if (event.key === 'Enter') {

@@ -58,7 +58,7 @@
   right: 0;
 }
 
-
+/*
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -105,7 +105,7 @@
   opacity: .3;
   cursor: pointer;
   border: none;
-}
+}*/
 
 button {
   font-size: .9rem;

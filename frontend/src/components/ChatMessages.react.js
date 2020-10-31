@@ -4,7 +4,8 @@ import {
     gql,
     useQuery
 } from '@apollo/client';
-
+import { css } from "@emotion/core";
+import ClipLoader from "react-spinners/ClipLoader";
 import ChatFeed from './ChatFeed.react';
 
 const GET_MESSAGES = gql`
@@ -31,6 +32,12 @@ const MESSAGE_SUBSCRIPTION = gql`
     }
 `;
 
+const override = css`
+  display: block;
+  margin: 0 auto;
+  border-color: red;
+`;
+
 function ChatMessages({
     selectedGroup, doneFetching, setDoneFetching
 }) {
@@ -45,7 +52,18 @@ function ChatMessages({
             fetchPolicy: "cache-and-network"
         }
     );
-    if (loading) return 'Loading...';
+    if (loading) return (<div style={{ marginLeft: '10px', marginRight: '10px', marginBottom: '50px' }}>
+        <div style={{ height: '30px' }}>
+            {
+                !doneFetching && <ClipLoader
+                    css={override}
+                    size={30}
+                    color={"#123abc"}
+                    loading={true}
+                />
+            }
+        </div>
+    </div>);
     if (error) return `Error! ${error.message}`;
     return <ChatFeed entries={data} selectedGroup={selectedGroup} doneFetching={doneFetching} onLoadMore={() => {
         if (doneFetching) {

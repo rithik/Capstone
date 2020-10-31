@@ -1,5 +1,4 @@
 import '../App.css';
-import { setCookie, getCookie, deleteCookie } from './cookieManager'
 
 function ab2str(buf: any) {
     return String.fromCharCode.apply(null, Array.from(new Uint8Array(buf)));

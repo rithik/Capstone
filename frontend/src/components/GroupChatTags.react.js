@@ -3,8 +3,13 @@ import TagsInput from 'react-tagsinput'
 import 'react-tagsinput/react-tagsinput.css'
 import { gql, useMutation } from '@apollo/client';
 import { TextField } from '@material-ui/core';
-import {generateGroupKeys} from '../utils/generateKeys'
+import { generateGroupKeys } from '../utils/generateKeys'
 import { encryptMessageForPrivateKey } from '../utils/AESEncryption';
+
+import Modal from 'react-bootstrap/Modal';
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const CREATE_GROUP = gql`
 mutation createGroup($name: String!, $publicKey: String!, $users: [String!]){
@@ -31,13 +36,16 @@ const SEND_MESSAGE = gql`
     }
 `;
 
-function GroupChatTags() {
+function GroupChatTags({ show, setShow }) {
     const [tags, setTags] = useState([]);
+
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
     const [groupName, setgroupName] = useState("");
     const [createMessage] = useMutation(SEND_MESSAGE);
     const [createGroup] = useMutation(CREATE_GROUP, {
         onCompleted({ createGroup }) {
-            const username  = localStorage.getItem('username');
+            const username = localStorage.getItem('username');
             const privateKey = localStorage.getItem('temp-group-privatekey')
             localStorage.setItem(`${createGroup.id}-privateKey`, privateKey);
             localStorage.removeItem('temp-group-privatekey');
@@ -46,6 +54,7 @@ function GroupChatTags() {
                 console.log(content);
                 createMessage({ variables: { username, gid: createGroup.id, content, cType: `group-private-key-${user.username}` } });
             });
+            handleClose();
         }
     });
 
@@ -57,7 +66,6 @@ function GroupChatTags() {
                 const privateKey = array.privateKey
                 localStorage.setItem('temp-group-privatekey', privateKey);
                 createGroup({ variables: { users: tags, publicKey: publicKey, name: groupName } });
-
             });
         }
         else {
@@ -67,12 +75,31 @@ function GroupChatTags() {
 
     return (
         <div>
-            <TagsInput value={tags} onChange={(newTags) => setTags(newTags)} inputProps={{
-                className: 'react-tagsinput-input',
-                placeholder: 'Add people!'
-            }} onlyUnique />
-            <TextField value={groupName} label="Group Name" onChange={(e) => setgroupName(e.target.value)}></TextField>
-            <button className="button-default" onClick={() => createGroupChat(tags, groupName)}>Create Group!</button>
+            <Modal show={show} transparent={"true"} onHide={handleClose}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Input the individuals to add to your new Group Chat!</Modal.Title>
+                </Modal.Header>
+
+                <Modal.Body>
+                    <TagsInput value={tags} onChange={(newTags) => setTags(newTags)} inputProps={{
+                        className: 'react-tagsinput-input',
+                        placeholder: 'Add people!'
+                    }} onlyUnique />
+                    <Form style={{marginTop: "20px"}}>
+                        <Form.Group>
+                            <Form.Control type="text" placeholder="GroupName" value={groupName} onChange={(e) => setgroupName(e.target.value)} />
+                        </Form.Group>
+                    </Form>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleClose}>
+                        Close
+          </Button>
+                    <Button variant="primary" onClick={() => createGroupChat(tags, groupName)}>
+                        Create Group!
+          </Button>
+                </Modal.Footer>
+            </Modal>
         </div>);
 }
 export default GroupChatTags;

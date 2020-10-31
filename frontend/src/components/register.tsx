@@ -3,7 +3,6 @@ import './../App.css';
 import {generateKeys} from '../utils/generateKeys'
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField'
-import { setCookie, getCookie, deleteCookie } from '../utils/cookieManager'
 import { gql, useMutation } from '@apollo/client';
 
 
