@@ -27,6 +27,6 @@ export function decryptMessageForPrivateKey(message){
     console.log(message);
     var crypt = new JSEncrypt();
     crypt.setPrivateKey(localStorage.getItem('user-privateKey'));
-    const decrypted = crypt.encrypt(message);
+    const decrypted = crypt.decrypt(message);
     return decrypted;
 }

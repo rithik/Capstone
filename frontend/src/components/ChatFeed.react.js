@@ -43,9 +43,9 @@ function ChatFeed({
     const messages = reversedEntries.map(message => {
         if (message.cType.includes("group-private-key")){
             if (message.cType.includes(username)){
-                if (localStorage.getItem(`${selectedGroup}-privateKey`) == null){
+                if (localStorage.getItem(`${selectedGroup}-privateKey`) == null || localStorage.getItem(`${selectedGroup}-privateKey`) === "undefined"){
                     const messageContent = decryptMessageForPrivateKey(message.content);
-                    localStorage.setItem(`${selectedGroup}-privateKey`, messageContent.message);
+                    localStorage.setItem(`${selectedGroup}-privateKey`, messageContent);
                 }
             }
             return null;

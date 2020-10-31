@@ -43,6 +43,7 @@ function GroupChatTags() {
             localStorage.removeItem('temp-group-privatekey');
             createGroup.users.map(user => {
                 const content = encryptMessageForPrivateKey(privateKey, user);
+                console.log(content);
                 createMessage({ variables: { username, gid: createGroup.id, content, cType: `group-private-key-${user.username}` } });
             });
         }
