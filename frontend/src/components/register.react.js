@@ -3,7 +3,11 @@ import './../App.css';
 import {generateKeys} from '../utils/generateKeys'
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField'
-import { gql, useMutation } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
+import Alert from '@material-ui/lab/Alert';
+import IconButton from '@material-ui/core/IconButton';
+import Collapse from '@material-ui/core/Collapse';
+import CloseIcon from '@material-ui/icons/Close';
 
 
 const CREATE_USER = gql`
@@ -23,8 +27,23 @@ const CREATE_TOKEN = gql`
 		}
 	}
 `;
+const GET_USER = gql`
+	query User($username: String!){
+		user(username:$username){
+			username
+			id
+		}
+	}
+`;
 
+const styles = theme => ({
+	notchedOutline: {
+	  borderWidth: "1px",
+	  borderColor: "yellow !important"
+	}
+  });
 
+// register the user
 function Register() {
 	const [createUser] = useMutation(CREATE_USER);
 	const [createToken] = useMutation(CREATE_TOKEN, {
@@ -35,24 +54,45 @@ function Register() {
 		}
 	});
 	const [myUsernameValue, setUsernameValue] = useState('');
+	const [usernameError, setUsernameError] = useState(false);
+
+	const {loading, error, data} = useQuery(GET_USER, {
+		variables: { username: myUsernameValue },
+	});
 
 	function sendData(myUsernameValue) {
-		const x = Promise.resolve(generateKeys(myUsernameValue)).then(function (array) {
-			const publicKey = array.publicKey
-			const privateKey = array.privateKey
-			createUser({ variables: { username: myUsernameValue, publicKey: publicKey } });
-			localStorage.setItem('user-privateKey', privateKey);
-			createToken({ variables: { username: myUsernameValue, publicKey: publicKey } });
-		});
+		if (error){
+			console.log('error in username')
+			setUsernameError(true)
+		}
+		else {
+			if(data['user'] == undefined){
+				setUsernameError(false)
+				const x = Promise.resolve(generateKeys(myUsernameValue)).then(function (array) {
+					const publicKey = array.publicKey
+					const privateKey = array.privateKey
+					createUser({ variables: { username: myUsernameValue, publicKey: publicKey } });
+					localStorage.setItem('user-privateKey', privateKey);
+					createToken({ variables: { username: myUsernameValue, publicKey: publicKey } });
+				});
+			}
+			else{
+				console.log('username exists')
+				setUsernameError(true)
+			}
+		}
 	}
 
 	return (
 		<div className="Register">
 			<TextField
-				InputProps={{ style: { color: "white" } }}
+				InputProps={{ 
+					style: { color: "white" },
+				}}
 				id="outlined-basic" label="Username"
 				variant="outlined"
 				value={myUsernameValue}
+				color={'white'}
 				onChange={(e) => setUsernameValue(e.target.value)}
 			/>
 			<br />
@@ -63,6 +103,28 @@ function Register() {
 			}} variant="contained" color="primary">
 				Register
 			</Button>
+			<br />
+			<br />
+			<Collapse in={usernameError}>
+				<Alert
+				action={
+					<IconButton
+					aria-label="close"
+					color="inherit"
+					size="small"
+					onClick={() => {
+						setUsernameError(false);
+					}}
+					>
+					<CloseIcon fontSize="inherit" />
+					</IconButton>
+				}
+				variant="filled" severity="error"
+				>
+				Invalid username - choose a unique username
+				</Alert>
+			</Collapse>
+
 		</div>
 	);
 }
