@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import Register from './components/register'
+import Register from './components/register.react'
 import {
   BrowserRouter as Router,
   Switch,
