@@ -36,13 +36,6 @@ const GET_USER = gql`
 	}
 `;
 
-const styles = theme => ({
-	notchedOutline: {
-	  borderWidth: "1px",
-	  borderColor: "yellow !important"
-	}
-  });
-
 // register the user
 function Register() {
 	const [createUser] = useMutation(CREATE_USER);
@@ -60,21 +53,27 @@ function Register() {
 		variables: { username: myUsernameValue },
 	});
 
+	function setKeys(myUsernameValue){
+		const x = Promise.resolve(generateKeys(myUsernameValue)).then(function (array) {
+			const publicKey = array.publicKey
+			const privateKey = array.privateKey
+			createUser({ variables: { username: myUsernameValue, publicKey: publicKey } });
+			localStorage.setItem('user-privateKey', privateKey);
+			createToken({ variables: { username: myUsernameValue, publicKey: publicKey } });
+		});
+	}
+
 	function sendData(myUsernameValue) {
 		if (error){
-			console.log('error in username')
-			setUsernameError(true)
+			console.log('error in username, still setting new user')
+			setKeys(myUsernameValue);
 		}
 		else {
-			if(data['user'] == undefined){
+			console.log(data)
+			if(data['user'] === null){
+				console.log('username is valid, creating new set of keys')
 				setUsernameError(false)
-				const x = Promise.resolve(generateKeys(myUsernameValue)).then(function (array) {
-					const publicKey = array.publicKey
-					const privateKey = array.privateKey
-					createUser({ variables: { username: myUsernameValue, publicKey: publicKey } });
-					localStorage.setItem('user-privateKey', privateKey);
-					createToken({ variables: { username: myUsernameValue, publicKey: publicKey } });
-				});
+				setKeys(myUsernameValue);
 			}
 			else{
 				console.log('username exists')
