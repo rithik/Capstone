@@ -30,7 +30,7 @@ async function exportCryptoPrivateKey(key: any) {
 export async function generateKeys(username: string) {
     const response = await window.crypto.subtle.generateKey({
         name: "RSA-OAEP",
-        modulusLength: 8192,
+        modulusLength: 2048,
         publicExponent: new Uint8Array([1, 0, 1]),
         hash: "SHA-256",
     },
