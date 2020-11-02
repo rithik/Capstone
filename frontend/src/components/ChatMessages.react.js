@@ -74,7 +74,6 @@ function ChatMessages({
                 offset: data.messagesByGroup.length
             },
             updateQuery: (prev, { fetchMoreResult }) => {
-                console.log(fetchMoreResult.messagesByGroup);
                 if (fetchMoreResult.messagesByGroup.length === 0) {
                     setDoneFetching(true);
                 }

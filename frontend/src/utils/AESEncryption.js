@@ -18,14 +18,12 @@ export function decryptMessage(message, groupId){
 
 export function encryptMessageForPrivateKey(message, user){
     var crypt = new JSEncrypt();
-    console.log(message, user);
     crypt.setPublicKey(user.publicKey);
     const encrypted = crypt.encrypt(message);
     return encrypted;
 }
 
 export function decryptMessageForPrivateKey(message){
-    console.log(message);
     var crypt = new JSEncrypt();
     crypt.setPrivateKey(localStorage.getItem('user-privateKey'));
     const decrypted = crypt.decrypt(message);
