@@ -57,5 +57,6 @@
   },
   "devDependencies": {
     "@types/pbkdf2": "^3.1.0"
-  }
+  },
+  "homepage": "."
 }
