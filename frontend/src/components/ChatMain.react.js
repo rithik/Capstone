@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import ChatLeftList from './ChatLeftList.react';
 import ChatMessages from './ChatMessages.react';
+import Button from 'react-bootstrap/Button';
 import './../App.css';
 
 import { ThemeProvider, darkTheme, elegantTheme, purpleTheme, defaultTheme } from '@livechat/ui-kit'
@@ -72,6 +73,11 @@ function ChatMain() {
     const [doneFetching, setDoneFetching] = useState(false)
     const [show, setShow] = useState(false);
 
+    const logout = () => {
+        localStorage.clear();
+        window.location.href = "http://localhost:3000";
+    }
+
     return (<>
     <GroupChatTags show={show} setShow={setShow} />
         <ThemeProvider theme={themes.defaultTheme}>
@@ -86,7 +92,8 @@ function ChatMain() {
                 left: 0
             }}>
                 <div className="App">
-                    <button className="button-default" onClick={() => setShow(!show)}>Create Group Chat</button>
+                    <Button variant="primary" style={{ marginRight: "10px" }} onClick={() => setShow(!show)}>Create Group Chat</Button>
+                    <Button variant="secondary" onClick={logout}>Logout</Button>
                 </div>
                 <ChatLeftList selectedGroup={selectedGroup} setSelectedGroup={setSelectedGroup} setDoneFetching={setDoneFetching}>
                 </ChatLeftList>
