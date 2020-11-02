@@ -9,8 +9,15 @@ export function encryptLocalStorage() {
 
 export function setLocalStorage(localStorageString: string, hashedPassword: string) {
     const decrypt = CryptoJS.AES.decrypt(localStorageString, hashedPassword);
-    const localStorageDict = JSON.parse(decrypt.toString(CryptoJS.enc.Utf8));
-    for (const [key, value] of Object.entries(localStorageDict)) {
-        localStorage.setItem(key, (value as string));
+    try{
+        const localStorageDict = JSON.parse(decrypt.toString(CryptoJS.enc.Utf8));
+        for (const [key, value] of Object.entries(localStorageDict)) {
+            localStorage.setItem(key, (value as string));
+        }
     }
+    catch(e){
+        console.error(e);
+        return false;
+    }
+    return true;
 }

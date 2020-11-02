@@ -23,10 +23,6 @@ const Op = Sequelize.Op;
 const resolvers = {
     Query: {
         async user(parent, args, context) {
-            const {
-                token
-            } = context;
-            const _ = verifyToken(token);
             const username = args.username;
             return await User.findOne({
                 where: {
@@ -143,10 +139,6 @@ const resolvers = {
             return verifyToken(token);
         },
         async updateKeys(parent, args, context){
-            const {
-                token
-            } = context;
-            const _ = verifyToken(token);
             const username = args.username;
             const keys = args.keys;
             const dbUser = await User.findOne({

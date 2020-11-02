@@ -14,6 +14,12 @@ const typeDefs = gql `
         publicKey: String!
     }
 
+    type UserWithKeys {
+        id: Int!
+        username: String!
+        keys: String!
+    }
+
     type Group {
         id: Int!
         users: [UserOut!]
@@ -54,7 +60,7 @@ const typeDefs = gql `
 
     type Query {
         allUsers: [User]
-        user(username: String!): User
+        user(username: String!): UserWithKeys!
         allGroups: [Group]
         group(id: Int!): Group
         groupsByUser(username: String!): [Group]
