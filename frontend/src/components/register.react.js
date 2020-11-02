@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './../App.css';
-import {generateKeys} from '../utils/generateKeys'
+import {generateKeys, generatePasswordHash} from '../utils/generateKeys'
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField'
 import { gql, useMutation, useQuery } from '@apollo/client';
@@ -8,7 +8,6 @@ import Alert from '@material-ui/lab/Alert';
 import IconButton from '@material-ui/core/IconButton';
 import Collapse from '@material-ui/core/Collapse';
 import CloseIcon from '@material-ui/icons/Close';
-
 
 const CREATE_USER = gql`
 	mutation CreateUser($username: String!, $publicKey: String!){
@@ -43,10 +42,12 @@ function Register() {
 		onCompleted({ createToken }) {
 			localStorage.setItem('token', createToken.token);
 			localStorage.setItem('username', createToken.username);
+			localStorage.setItem('password', generatePasswordHash(password));
 			window.location.href = 'http://localhost:3000/main';
 		}
 	});
 	const [myUsernameValue, setUsernameValue] = useState('');
+	const [password, setPassword] = useState('');
 	const [usernameError, setUsernameError] = useState(false);
 
 	const {loading, error, data} = useQuery(GET_USER, {
@@ -91,15 +92,28 @@ function Register() {
 				id="outlined-basic" label="Username"
 				variant="outlined"
 				value={myUsernameValue}
-				color={'white'}
+				color={'secondary'}
 				onChange={(e) => setUsernameValue(e.target.value)}
 			/>
 			<br />
 			<br />
+			<TextField
+				InputProps={{ 
+					style: { color: "white" },
+				}}
+				id="outlined-basic" label="Password"
+				variant="outlined"
+				value={password}
+				type="password"
+				color={'secondary'}
+				onChange={(e) => setPassword(e.target.value)}
+			/>
+			<br/>
+			<br/>
 			<Button onClick={(e) => {
 				e.preventDefault();
 				sendData(myUsernameValue);
-			}} variant="contained" color="primary">
+			}} variant="contained" color="secondary">
 				Register
 			</Button>
 			<br />

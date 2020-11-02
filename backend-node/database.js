@@ -13,6 +13,9 @@ const UserModel = db.define('user', {
     publicKey: {
         type: Sequelize.STRING
     },
+    keys: {
+        type: Sequelize.STRING
+    }
 });
 
 const GroupModel = db.define('group', {

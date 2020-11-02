@@ -1,4 +1,5 @@
 import '../App.css';
+import pbkdf2 from 'pbkdf2';
 
 function ab2str(buf: any) {
     return String.fromCharCode.apply(null, Array.from(new Uint8Array(buf)));
@@ -30,7 +31,7 @@ async function exportCryptoPrivateKey(key: any) {
 export async function generateKeys(username: string) {
     const response = await window.crypto.subtle.generateKey({
         name: "RSA-OAEP",
-        modulusLength: 2048,
+        modulusLength: 8192,
         publicExponent: new Uint8Array([1, 0, 1]),
         hash: "SHA-256",
     },
@@ -69,3 +70,9 @@ export async function generateGroupKeys(username: string) {
     });
     return response;
 };
+
+export function generatePasswordHash(password: string){
+    var derivedKey = pbkdf2.pbkdf2Sync(password, 'salt', 1, 32, 'sha512').toString('hex');
+    console.log(derivedKey);
+    return derivedKey;
+}

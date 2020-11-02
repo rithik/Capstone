@@ -142,6 +142,24 @@ const resolvers = {
             } = args;
             return verifyToken(token);
         },
+        async updateKeys(parent, args, context){
+            const {
+                token
+            } = context;
+            const _ = verifyToken(token);
+            const username = args.username;
+            const keys = args.keys;
+            const dbUser = await User.findOne({
+                where: {
+                    username
+                }
+            });
+            dbUser.keys = keys;
+            await dbUser.save();
+            return {
+                success: true
+            };
+        },
         async createUser(parent, args, context) {
             const newUser = {
                 username: args.username,

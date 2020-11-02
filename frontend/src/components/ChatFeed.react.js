@@ -6,7 +6,7 @@ import { css } from "@emotion/core";
 import { gql, useMutation } from '@apollo/client';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {encryptMessage, decryptMessage, decryptMessageForPrivateKey} from '../utils/AESEncryption';
-
+import {encryptLocalStorage} from '../utils/localStorageKeyGen';
 
 const override = css`
   display: block;
@@ -23,6 +23,14 @@ const SEND_MESSAGE = gql`
     }
 `;
 
+const UPDATE_KEYS = gql`
+    mutation updateKeys($username: String!, $keys: String!){
+        updateKeys(username:$username, keys:$keys){
+            success
+        }
+    }
+`;
+
 function ChatFeed({
     entries,
     onLoadMore,
@@ -33,6 +41,7 @@ function ChatFeed({
     const [firstLoad, setFirstLoad] = useState(true);
     const [messageInput, setMessageInput] = useState("");
     const [createMessage] = useMutation(SEND_MESSAGE);
+    const [updateKeys] = useMutation(UPDATE_KEYS);
     let messagesEndRef = React.createRef();
     let messagesStartRef = React.createRef();
 
@@ -45,6 +54,7 @@ function ChatFeed({
                 if (localStorage.getItem(`${selectedGroup}-privateKey`) == null || localStorage.getItem(`${selectedGroup}-privateKey`) === "undefined"){
                     const messageContent = decryptMessageForPrivateKey(message.content);
                     localStorage.setItem(`${selectedGroup}-privateKey`, messageContent);
+                    updateKeys({variables: {username, keys: encryptLocalStorage()}});
                 }
             }
             return null;

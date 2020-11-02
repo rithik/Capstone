@@ -5,6 +5,7 @@ import { gql, useMutation } from '@apollo/client';
 import { TextField } from '@material-ui/core';
 import { generateGroupKeys } from '../utils/generateKeys'
 import { encryptMessageForPrivateKey } from '../utils/AESEncryption';
+import {encryptLocalStorage} from '../utils/localStorageKeyGen';
 
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
@@ -36,12 +37,21 @@ const SEND_MESSAGE = gql`
     }
 `;
 
+const UPDATE_KEYS = gql`
+    mutation updateKeys($username: String!, $keys: String!){
+        updateKeys(username:$username, keys:$keys){
+            success
+        }
+    }
+`;
+
 function GroupChatTags({ show, setShow }) {
     const [tags, setTags] = useState([]);
 
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
     const [groupName, setgroupName] = useState("");
+    const [updateKeys] = useMutation(UPDATE_KEYS);
     const [createMessage] = useMutation(SEND_MESSAGE);
     const [createGroup] = useMutation(CREATE_GROUP, {
         onCompleted({ createGroup }) {
@@ -54,6 +64,7 @@ function GroupChatTags({ show, setShow }) {
                 console.log(content);
                 createMessage({ variables: { username, gid: createGroup.id, content, cType: `group-private-key-${user.username}` } });
             });
+            updateKeys({variables: {username, keys: encryptLocalStorage()}});
             handleClose();
         }
     });

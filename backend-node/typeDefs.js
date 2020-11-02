@@ -48,6 +48,10 @@ const typeDefs = gql `
         publicKey: String!
     }
 
+    type SuccessOut {
+        success: Boolean!
+    }
+
     type Query {
         allUsers: [User]
         user(username: String!): User
@@ -75,6 +79,7 @@ const typeDefs = gql `
             sender: String!,
             cType: String!
         ): Message
+        updateKeys(username: String!, keys: String!): SuccessOut!
     }
 
     type Subscription {
