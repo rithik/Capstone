@@ -1,8 +1,8 @@
 const Sequelize = require('sequelize');
 
-const production = process.env.PRODUCTION;
+const production = true; //process.env.PRODUCTION;
 
-const db = production ? new Sequelize(process.env.DATABASE_URL, {
+const db = production ? new Sequelize("postgres://vfukpcyiecobis:ab99b8c630954d38b3de8a57dac74b614245ee339799a51ca77f5ec1d230bb00@ec2-54-224-124-241.compute-1.amazonaws.com:5432/d6ta6ho824ru7j", {
     dialect: 'postgres',
     protocol: 'postgres',
     dialectOptions: {
