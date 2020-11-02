@@ -5,6 +5,7 @@ const production = process.env.PRODUCTION;
 const db = production ? new Sequelize(process.env.DATABASE_URL, {
     dialect: 'postgres',
     protocol: 'postgres',
+    logging: false,
     dialectOptions: {
         ssl: {
             require: true,
