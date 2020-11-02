@@ -2,7 +2,13 @@ const Sequelize = require('sequelize');
 
 const production = process.env.PRODUCTION;
 
-const db = production ? new Sequelize(process.env.DATABASE_URL) : new Sequelize('capstone', null, null, {
+const db = production ? new Sequelize(process.env.DATABASE_URL, {
+    dialect: 'postgres',
+    protocol: 'postgres',
+    dialectOptions: {
+        ssl: true
+    }
+}) : new Sequelize('capstone', null, null, {
     dialect: 'sqlite',
     storage: './capstone.sqlite',
     logging: false
