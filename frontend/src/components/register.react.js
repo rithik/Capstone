@@ -98,18 +98,14 @@ function Register() {
 
 	const registerUser = () => {
 		if (error) {
-			console.log('error in username, still setting new user')
 			setKeys(registerUsername);
 		}
 		else {
-			console.log(data)
 			if (data.user === null) {
-				console.log('username is valid, creating new set of keys')
 				setRegisterUsernameError(false)
 				setKeys(registerUsername);
 			}
 			else {
-				console.log('username exists')
 				setRegisterUsernameError(true)
 			}
 		}
@@ -117,20 +113,15 @@ function Register() {
 
 	const loginUser = () => {
 		if (error) {
-			console.log(error);
+			console.error(error);
 			setLoginError(true);
 		}
 		else {
-			console.log(data)
 			if (data.user === null) {
-				console.log('username is valid, creating new set of keys')
 				setLoginError(true)
 			}
 			else {
-				console.log('username exists')
-				console.log(data.user);
 				const hashedPassword = generatePasswordHash(loginPassword);
-				console.log(hashedPassword);
 				const success = setLocalStorage(data.user.keys, hashedPassword);
 				if (success){
 					const username = localStorage.getItem('username');
