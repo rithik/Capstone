@@ -5,6 +5,7 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
+  HashRouter
 } from "react-router-dom";
 import { ApolloClient, InMemoryCache, createHttpLink, ApolloProvider } from '@apollo/client';
 import ChatMain from './components/ChatMain.react';
@@ -58,7 +59,7 @@ function App() {
   });
 
   return (
-    <Router>
+    <HashRouter basename='/'>
       <Switch>
         <Route path="/main">
           <ApolloProvider client={client}>
@@ -77,7 +78,7 @@ function App() {
          </ApolloProvider>
         </Route>
       </Switch>
-    </Router>
+    </HashRouter>
 
   );
 }

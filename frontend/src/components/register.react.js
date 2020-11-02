@@ -58,7 +58,7 @@ function Register() {
 			localStorage.setItem('username', createToken.username);
 			localStorage.setItem('password', generatePasswordHash(password));
 			updateKeys({variables: {username: createToken.username, keys: encryptLocalStorage()}});
-			window.location.href = window.location.href + '/main';
+			window.location.href = window.location.href + 'main';
 		}
 	});
 
