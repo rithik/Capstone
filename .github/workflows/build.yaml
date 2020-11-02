@@ -17,6 +17,7 @@ jobs:
           cd frontend
           npm install
           npm run build
+          gh-pages -d build
           echo "Minified files"
         env: 
             CI: false
