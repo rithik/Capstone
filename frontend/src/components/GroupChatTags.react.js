@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import TagsInput from 'react-tagsinput'
 import 'react-tagsinput/react-tagsinput.css'
 import { gql, useMutation } from '@apollo/client';
-import { TextField } from '@material-ui/core';
 import { generateGroupKeys } from '../utils/generateKeys'
 import { encryptMessageForPrivateKey } from '../utils/AESEncryption';
 import {encryptLocalStorage} from '../utils/localStorageKeyGen';
@@ -49,7 +48,6 @@ function GroupChatTags({ show, setShow }) {
     const [tags, setTags] = useState([]);
 
     const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
     const [groupName, setgroupName] = useState("");
     const [updateKeys] = useMutation(UPDATE_KEYS);
     const [createMessage] = useMutation(SEND_MESSAGE);
@@ -61,8 +59,8 @@ function GroupChatTags({ show, setShow }) {
             localStorage.removeItem('temp-group-privatekey');
             createGroup.users.map(user => {
                 const content = encryptMessageForPrivateKey(privateKey, user);
-                console.log(content);
                 createMessage({ variables: { username, gid: createGroup.id, content, cType: `group-private-key-${user.username}` } });
+                return true;
             });
             updateKeys({variables: {username, keys: encryptLocalStorage()}});
             handleClose();

@@ -75,7 +75,10 @@ function ChatMain() {
 
     const logout = () => {
         localStorage.clear();
-        window.location.href = "http://localhost:3000";
+        let fullURL = window.location.href.split('/');
+        fullURL.pop();
+        const baseURL = fullURL.join('/')
+        window.location.href = baseURL ;
     }
 
     return (<>

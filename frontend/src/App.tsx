@@ -14,9 +14,11 @@ import { getMainDefinition } from '@apollo/client/utilities';
 import { WebSocketLink } from '@apollo/client/link/ws';
 
 function App() {
+  const serverURL = process.env.PRODUCTION ? 'https://e2-chat.herokuapp.com' : 'http://localhost:4000';
+  const wsURL = process.env.PRODUCTION ? 'wss://e2-chat.herokuapp.com' : 'ws://localhost:4000';
   const token = localStorage.getItem('token');
   const httpLink = createHttpLink({
-    uri: 'http://localhost:4000/graphql',
+    uri: `${serverURL}/graphql`,
   });
 
   const authLink = setContext((_, { headers }) => {
@@ -29,7 +31,7 @@ function App() {
   });
   
   const wsLink = new WebSocketLink({
-    uri: `ws://localhost:4000/graphql`,
+    uri: `${wsURL}/graphql`,
     options: {
       reconnect: true,
       connectionParams: {

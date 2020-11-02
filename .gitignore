@@ -11,7 +11,7 @@ backend-django/db.sqlite3
 frontend/coverage
 
 # production
-frontend/build
+# frontend/build
 backend-django/build
 
 # misc

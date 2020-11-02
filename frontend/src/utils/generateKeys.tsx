@@ -73,6 +73,5 @@ export async function generateGroupKeys(username: string) {
 
 export function generatePasswordHash(password: string){
     var derivedKey = pbkdf2.pbkdf2Sync(password, 'salt', 1, 32, 'sha512').toString('hex');
-    console.log(derivedKey);
     return derivedKey;
 }

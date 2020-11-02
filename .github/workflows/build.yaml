@@ -1,0 +1,26 @@
+name: Build for Web
+on:
+  push:
+    branches:
+        - master
+
+jobs:
+    build:
+      runs-on: ubuntu-latest
+      steps:
+      - uses: actions/checkout@master
+        with:
+          persist-credentials: false
+          fetch-depth: 0 
+      - name: Build Frontend
+        run: |
+          cd frontend
+          npm install
+          npm run build
+          echo "Minified files"
+      - name: Deploy 🚀
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./

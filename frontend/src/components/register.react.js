@@ -58,14 +58,14 @@ function Register() {
 			localStorage.setItem('username', createToken.username);
 			localStorage.setItem('password', generatePasswordHash(password));
 			updateKeys({variables: {username: createToken.username, keys: encryptLocalStorage()}});
-			window.location.href = 'http://localhost:3000/main';
+			window.location.href = window.location.href + '/main';
 		}
 	});
 
 	const [createLoginToken] = useMutation(CREATE_TOKEN, {
 		onCompleted({ createToken }) {
 			localStorage.setItem('token', createToken.token);
-			window.location.href = 'http://localhost:3000/main';
+			window.location.href = window.location.href + 'main';
 		}
 	});
 

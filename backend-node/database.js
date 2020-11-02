@@ -1,6 +1,8 @@
 const Sequelize = require('sequelize');
 
-const db = new Sequelize('capstone', null, null, {
+const production = process.env.PRODUCTION;
+
+const db = production ? new Sequelize(process.env.DATABASE_URL) : new Sequelize('capstone', null, null, {
     dialect: 'sqlite',
     storage: './capstone.sqlite',
     logging: false
@@ -38,15 +40,19 @@ const MessageModel = db.define('message', {
 
 const UserGroupModel = db.define('user_groups', {
     id: {
-      type: Sequelize.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-      allowNull: false
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+        allowNull: false
     }
-  });
+});
 
-UserModel.belongsToMany(GroupModel, { through: UserGroupModel });
-GroupModel.belongsToMany(UserModel, { through: UserGroupModel });
+UserModel.belongsToMany(GroupModel, {
+    through: UserGroupModel
+});
+GroupModel.belongsToMany(UserModel, {
+    through: UserGroupModel
+});
 MessageModel.belongsTo(GroupModel);
 MessageModel.belongsTo(UserModel);
 
