@@ -78,7 +78,7 @@ function ChatMain() {
         let fullURL = window.location.href.split('/');
         fullURL.pop();
         const baseURL = fullURL.join('/')
-        window.location.href = baseURL ;
+        window.location.href = baseURL;
     }
 
     return (<>
