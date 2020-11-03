@@ -28,10 +28,10 @@ async function exportCryptoPrivateKey(key: any) {
 }
 
 
-export async function generateKeys(username: string) {
+export async function generateKeys(username: string, modulus: number) {
     const response = await window.crypto.subtle.generateKey({
         name: "RSA-OAEP",
-        modulusLength: 8192,
+        modulusLength: modulus,
         publicExponent: new Uint8Array([1, 0, 1]),
         hash: "SHA-256",
     },
@@ -49,27 +49,6 @@ export async function generateKeys(username: string) {
     return response;
 }
 
-
-export async function generateGroupKeys(username: string) {
-    const response = await window.crypto.subtle.generateKey({
-        name: "RSA-OAEP",
-        modulusLength: 256,
-        publicExponent: new Uint8Array([1, 0, 1]),
-        hash: "SHA-256",
-    },
-        true,
-        ["encrypt", "decrypt"]
-    ).then(async (keyPair) => {
-        const publicKey = await exportCryptoPublicKey(keyPair.publicKey);
-        const privateKey = await exportCryptoPrivateKey(keyPair.privateKey);
-        return {
-            privateKey,
-            username,
-            publicKey
-        }
-    });
-    return response;
-};
 
 export function generatePasswordHash(password: string){
     var derivedKey = pbkdf2.pbkdf2Sync(password, 'salt', 1, 32, 'sha512').toString('hex');
