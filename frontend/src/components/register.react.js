@@ -95,7 +95,7 @@ function Register() {
 
 	const setKeys = async (myUsernameValue) => {
 		const username = tab === 'login' ? loginUsername : registerUsername;
-		const x = Promise.resolve(generateKeys(myUsernameValue)).then(function (array) {
+		const x = Promise.resolve(generateKeys(myUsernameValue, 4096)).then(function (array) {
 			const publicKey = array.publicKey
 			const privateKey = array.privateKey
 			createUser({ variables: { username, publicKey } });
