@@ -50,14 +50,7 @@ function ChatFeed({
     const username = localStorage.getItem('username');
     const messages = reversedEntries.map(message => {
         console.log(message);
-        if (message.cType.includes("group-private-key")){
-            if (message.cType.includes(username)){
-                if (localStorage.getItem(`${selectedGroup}-privateKey`) == null || localStorage.getItem(`${selectedGroup}-privateKey`) === "undefined"){
-                    const messageContent = decryptMessageForPrivateKey(message.content);
-                    localStorage.setItem(`${selectedGroup}-privateKey`, messageContent);
-                    updateKeys({variables: {username, keys: encryptLocalStorage()}});
-                }
-            }
+        if (localStorage.getItem(`${selectedGroup}-privateKey`) == null || localStorage.getItem(`${selectedGroup}-privateKey`) === 'undefined'){
             return null;
         }
         return new Message({ id: message.sender === username ? 0 : message.sender, message: decryptMessage(message.content, selectedGroup).message, senderName: `@${message.sender}` })

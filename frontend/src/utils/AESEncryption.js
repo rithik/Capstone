@@ -15,7 +15,6 @@ export function decryptMessage(message, groupId){
     return JSON.parse(decrypt.toString(CryptoJS.enc.Utf8));
 }
 
-
 export function encryptMessageForPrivateKey(message, user){
     var crypt = new JSEncrypt();
     crypt.setPublicKey(user.publicKey);

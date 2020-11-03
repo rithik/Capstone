@@ -54,6 +54,9 @@ const UserGroupModel = db.define('user_groups', {
         primaryKey: true,
         autoIncrement: true,
         allowNull: false
+    }, 
+    privateKey: {
+        type: Sequelize.TEXT
     }
 });
 
