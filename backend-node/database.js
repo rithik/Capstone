@@ -41,7 +41,7 @@ const GroupModel = db.define('group', {
 
 const MessageModel = db.define('message', {
     content: {
-        type: Sequelize.STRING
+        type: Sequelize.TEXT
     },
     cType: {
         type: Sequelize.STRING
