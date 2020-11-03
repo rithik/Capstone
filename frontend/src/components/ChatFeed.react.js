@@ -49,6 +49,7 @@ function ChatFeed({
     const reversedEntries = [].concat(entries.messagesByGroup).reverse();
     const username = localStorage.getItem('username');
     const messages = reversedEntries.map(message => {
+        console.log(message);
         if (message.cType.includes("group-private-key")){
             if (message.cType.includes(username)){
                 if (localStorage.getItem(`${selectedGroup}-privateKey`) == null || localStorage.getItem(`${selectedGroup}-privateKey`) === "undefined"){
