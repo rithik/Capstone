@@ -23,10 +23,10 @@ const UserModel = db.define('user', {
         type: Sequelize.STRING
     },
     publicKey: {
-        type: Sequelize.STRING
+        type: Sequelize.TEXT
     },
     keys: {
-        type: Sequelize.STRING
+        type: Sequelize.TEXT
     }
 });
 
@@ -35,7 +35,7 @@ const GroupModel = db.define('group', {
         type: Sequelize.STRING
     },
     publicKey: {
-        type: Sequelize.STRING
+        type: Sequelize.TEXT
     },
 });
 
