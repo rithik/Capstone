@@ -34,6 +34,13 @@ const typeDefs = gql `
         publicKey: String!
     }
     
+    type GroupOutWithPrivateKey {
+        id: Int!
+        users: [UserOut!]
+        name: String!
+        publicKey: String!
+        privateKey: String!
+    }
 
     type Message {
         id: Int!
@@ -60,10 +67,10 @@ const typeDefs = gql `
 
     type Query {
         allUsers: [User]
-        user(username: String!): UserWithKeys!
+        user(username: String!): UserWithKeys
         allGroups: [Group]
         group(id: Int!): Group
-        groupsByUser(username: String!): [Group]
+        groupsByUser(username: String!): [GroupOutWithPrivateKey]
         messagesByGroup(gid: Int!, after: String, before: String, count: Int, offset: Int): [Message]
     }
 
@@ -86,11 +93,12 @@ const typeDefs = gql `
             cType: String!
         ): Message
         updateKeys(username: String!, keys: String!): SuccessOut!
+        createPrivateKey(username: String!, gid: Int!, privateKey: String!): GroupOutWithPrivateKey
     }
 
     type Subscription {
         newMessage(gid: Int!): Message
-        newGroup(username: String!): GroupOut
+        newGroup(username: String!): GroupOutWithPrivateKey
     }
 `;
 

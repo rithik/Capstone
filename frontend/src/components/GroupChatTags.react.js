@@ -26,12 +26,10 @@ mutation createGroup($name: String!, $publicKey: String!, $users: [String!]){
 `;
 
 const SEND_MESSAGE = gql`
-    mutation SendMessage($username: String!, $content: String!, $gid: Int!, $cType: String!){
-        createMessage(sender:$username, group:$gid, content:$content, cType: $cType){
+    mutation createPrivateKey($username: String!, $privateKey: String!, $gid: Int!){
+        createPrivateKey(username:$username, gid:$gid, privateKey:$privateKey){
             id
-            content
-            ts
-            cType
+            privateKey
         }
     }
 `;
@@ -50,7 +48,7 @@ function GroupChatTags({ show, setShow }) {
     const handleClose = () => setShow(false);
     const [groupName, setgroupName] = useState("");
     const [updateKeys] = useMutation(UPDATE_KEYS);
-    const [createMessage] = useMutation(SEND_MESSAGE);
+    const [createPrivateKey] = useMutation(SEND_MESSAGE);
     const [createGroup] = useMutation(CREATE_GROUP, {
         onCompleted({ createGroup }) {
             const username = localStorage.getItem('username');
@@ -59,7 +57,7 @@ function GroupChatTags({ show, setShow }) {
             localStorage.removeItem('temp-group-privatekey');
             createGroup.users.map(user => {
                 const content = encryptMessageForPrivateKey(privateKey, user);
-                createMessage({ variables: { username, gid: createGroup.id, content, cType: `group-private-key-${user.username}` } });
+                createPrivateKey({ variables: { username: user.username, gid: createGroup.id, privateKey: content} });
                 return true;
             });
             updateKeys({variables: {username, keys: encryptLocalStorage()}});

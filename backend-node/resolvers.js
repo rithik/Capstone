@@ -81,7 +81,7 @@ const resolvers = {
                     userId: user.dataValues.id
                 }
             });
-            const all_groups = await getGroupsForUser(groups);
+            const all_groups = await getGroupsForUser(groups, user.dataValues.id);
             return all_groups;
         },
         async messagesByGroup(parent, args, context) {
@@ -117,7 +117,7 @@ const resolvers = {
                     content: message.dataValues.content,
                     group: message.dataValues.groupId,
                     sender: user.dataValues.username,
-                    ts: message.dataValues.createdAt, 
+                    ts: message.dataValues.createdAt,
                     cType: message.dataValues.cType
                 }
             });
@@ -138,7 +138,7 @@ const resolvers = {
             } = args;
             return verifyToken(token);
         },
-        async updateKeys(parent, args, context){
+        async updateKeys(parent, args, context) {
             const username = args.username;
             const keys = args.keys;
             const dbUser = await User.findOne({
@@ -186,12 +186,12 @@ const resolvers = {
                 publicKey: dbGroup.dataValues.publicKey,
                 users: userObjs,
             };
-            args.users.map(username => {
-                const channel_name = `NEW_GROUP_${username}`;
-                pubsub.publish(channel_name, {
-                    newGroup: returnObj
-                });
-            });
+            // args.users.map(username => {
+            //     const channel_name = `NEW_GROUP_${username}`;
+            //     pubsub.publish(channel_name, {
+            //         newGroup: returnObj
+            //     });
+            // });
             return returnObj;
         },
         async createMessage(parent, args, context) {
@@ -220,7 +220,7 @@ const resolvers = {
                 content: dbMessage.dataValues.content,
                 group: dbMessage.dataValues.groupId,
                 sender: args.sender,
-                ts: dbMessage.dataValues.createdAt, 
+                ts: dbMessage.dataValues.createdAt,
                 cType: args.cType
             };
             pubsub.publish(channel_name, {
@@ -228,13 +228,57 @@ const resolvers = {
             });
             return returnMessage;
         },
+        async createPrivateKey(parent, args, context) {
+            const {
+                token
+            } = context;
+            const _ = verifyToken(token);
+            const username = args.username;
+            const groupId = args.gid;
+            const privateKey = args.privateKey;
+            const dbGroup = await Group.findOne({
+                where: {
+                    id: groupId
+                }
+            });
+            const dbUser = await User.findOne({
+                where: {
+                    username
+                }
+            });
+            const dbUserGroup = await UserGroup.findOne({
+                where: {
+                    userId: dbUser.dataValues.id,  
+                    groupId
+                }
+            });
+            dbUserGroup.privateKey = privateKey;
+            await dbUserGroup.save();
+            const userObjs = await getUsersByGroupId(groupId);
+            const returnObj = {
+                id: dbGroup.dataValues.id,
+                name: dbGroup.dataValues.name,
+                publicKey: dbGroup.dataValues.publicKey,
+                users: userObjs,
+                privateKey
+            };
+            const channel_name = `NEW_GROUP_${username}`;
+            console.log(channel_name);
+            pubsub.publish(channel_name, {
+                newGroup: returnObj
+            });
+            return returnObj;
+        },
     },
     Subscription: {
         newMessage: {
             subscribe: (parent, args, context, info) => pubsub.asyncIterator([`MESSAGE_GID_${args.gid}`])
         },
         newGroup: {
-            subscribe: (parent, args, context, info) => pubsub.asyncIterator([`NEW_GROUP_${args.username}`])
+            subscribe: (parent, args, context, info) => {
+                console.log(args);
+                return pubsub.asyncIterator([`NEW_GROUP_${args.username}`]);
+            }
         },
     },
 };
@@ -248,7 +292,8 @@ const addUserstoGroup = async (usernames, groupId) => {
         });
         const user = UserGroup.build({
             userId: groupMember.dataValues.id,
-            groupId
+            groupId, 
+            privateKey: ""
         });
         await user.save();
         return groupMember.dataValues.id;
@@ -283,11 +328,28 @@ const getGroups = async (group_ids) => {
     }));
 }
 
-const getGroupsForUser = async (group_ids) => {
+const getUsersByGroupId = async (groupId) => {
+    const users = await UserGroup.findAll({
+        where: {
+            groupId
+        }
+    });
+    const userUsernames = await getUsersById(users);
+    const userObjs = await getUsersByUsernames(userUsernames);
+    return userObjs;
+}
+
+const getGroupsForUser = async (group_ids, userId) => {
     return Promise.all(group_ids.map(async group => {
         const users = await UserGroup.findAll({
             where: {
                 groupId: group.dataValues.groupId
+            }
+        });
+        const userGroup = await UserGroup.findOne({
+            where: {
+                groupId: group.dataValues.groupId,
+                userId
             }
         });
         const groupObj = await Group.findOne({
@@ -301,7 +363,8 @@ const getGroupsForUser = async (group_ids) => {
             id: groupObj.dataValues.id,
             name: groupObj.dataValues.name,
             publicKey: groupObj.dataValues.publicKey,
-            users: userObjs
+            users: userObjs,
+            privateKey: userGroup.dataValues.privateKey
         }
     }));
 }

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 
 import {
   gql,
@@ -6,6 +6,8 @@ import {
 } from '@apollo/client';
 
 import { ChatList, ChatListItem, Avatar, Column, Row, Title, Subtitle } from '@livechat/ui-kit'
+
+import { decryptMessageForPrivateKey } from '../utils/AESEncryption';
 
 const GET_GROUPS = gql`
   query getGroupsWithUser($username: String!) {
@@ -15,6 +17,7 @@ const GET_GROUPS = gql`
       users {
         username
       }
+      privateKey
     }
   }
 `;
@@ -28,6 +31,7 @@ const GROUP_SUBSCRIPTION = gql`
           }
           name
           publicKey
+          privateKey
         }
     }
 `;
@@ -54,6 +58,7 @@ function ChatLeftList({ selectedGroup, setSelectedGroup, setDoneFetching }) {
       updateQuery: (prev, { subscriptionData }) => {
         if (!subscriptionData.data) return prev;
         const newGroup = subscriptionData.data.newGroup;
+        localStorage.setItem(`${newGroup.id}-privateKey`, decryptMessageForPrivateKey(newGroup.privateKey));
         return Object.assign({}, prev, {
           groupsByUser: [newGroup, ...prev.groupsByUser]
         });
@@ -62,7 +67,7 @@ function ChatLeftList({ selectedGroup, setSelectedGroup, setDoneFetching }) {
   };
 
   useEffect(() => {
-    if (!firstLoad){
+    if (!firstLoad) {
       setFirstLoad(true);
       subscribeToNewMessages();
     }
@@ -73,6 +78,9 @@ function ChatLeftList({ selectedGroup, setSelectedGroup, setDoneFetching }) {
   if (error) return `Error! ${error.message}`;
 
   const groupDivs = data.groupsByUser.map(group => {
+    if (localStorage.getItem(`${group.id}-privateKey`) == null || localStorage.getItem(`${group.id}-privateKey`) == 'undefined') {
+      localStorage.setItem(`${group.id}-privateKey`, decryptMessageForPrivateKey(group.privateKey));
+    }
     const users = group.users.map(user => `@${user.username}`);
     return (
       <div key={group.id} onClick={() => { setSelectedGroup(group.id); setDoneFetching(false) }}>
