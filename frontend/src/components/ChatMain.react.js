@@ -68,7 +68,7 @@ const themes = {
     },
 }
 
-function ChatMain() {
+function ChatMain({client}) {
     const [selectedGroup, setSelectedGroup] = useState(null);
     const [doneFetching, setDoneFetching] = useState(false)
     const [show, setShow] = useState(false);
@@ -98,7 +98,7 @@ function ChatMain() {
                     <Button variant="primary" style={{ marginRight: "10px" }} onClick={() => setShow(!show)}>Create Group Chat</Button>
                     <Button variant="secondary" onClick={logout}>Logout</Button>
                 </div>
-                <ChatLeftList selectedGroup={selectedGroup} setSelectedGroup={setSelectedGroup} setDoneFetching={setDoneFetching}>
+                <ChatLeftList client={client} selectedGroup={selectedGroup} setSelectedGroup={setSelectedGroup} setDoneFetching={setDoneFetching}>
                 </ChatLeftList>
             </div>
 

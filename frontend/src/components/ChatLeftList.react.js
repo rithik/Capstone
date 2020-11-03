@@ -36,7 +36,7 @@ const GROUP_SUBSCRIPTION = gql`
     }
 `;
 
-function ChatLeftList({ selectedGroup, setSelectedGroup, setDoneFetching }) {
+function ChatLeftList({ selectedGroup, setSelectedGroup, setDoneFetching, client }) {
   const username = localStorage.getItem('username');
   const [firstLoad, setFirstLoad] = useState(false);
 
@@ -44,7 +44,8 @@ function ChatLeftList({ selectedGroup, setSelectedGroup, setDoneFetching }) {
     subscribeToMore,
     loading,
     error,
-    data
+    data, 
+    refetch
   } = useQuery(GET_GROUPS, {
     variables: {
       username
@@ -75,7 +76,11 @@ function ChatLeftList({ selectedGroup, setSelectedGroup, setDoneFetching }) {
 
 
   if (loading) return 'Loading...';
-  if (error) return `Error! ${error.message}`;
+  if (error){
+    client.resetStore();
+    refetch();
+    return `Error! ${error.message}`;
+  }
 
   const groupDivs = data.groupsByUser.map(group => {
     if (localStorage.getItem(`${group.id}-privateKey`) == null || localStorage.getItem(`${group.id}-privateKey`) == 'undefined') {

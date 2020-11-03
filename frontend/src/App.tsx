@@ -65,7 +65,7 @@ function App() {
         <Route path="/main">
           <ApolloProvider client={client}>
             <div>
-              <ChatMain></ChatMain>
+              <ChatMain client={client}/>
             </div>
           </ApolloProvider>
         </Route>
