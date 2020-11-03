@@ -23,14 +23,6 @@ const SEND_MESSAGE = gql`
     }
 `;
 
-const UPDATE_KEYS = gql`
-    mutation updateKeys($username: String!, $keys: String!){
-        updateKeys(username:$username, keys:$keys){
-            success
-        }
-    }
-`;
-
 function ChatFeed({
     entries,
     onLoadMore,
@@ -41,7 +33,6 @@ function ChatFeed({
     const [firstLoad, setFirstLoad] = useState(true);
     const [messageInput, setMessageInput] = useState("");
     const [createMessage] = useMutation(SEND_MESSAGE);
-    const [updateKeys] = useMutation(UPDATE_KEYS);
     let messagesEndRef = React.createRef();
     let messagesStartRef = React.createRef();
 

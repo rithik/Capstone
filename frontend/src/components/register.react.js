@@ -10,7 +10,8 @@ import Collapse from '@material-ui/core/Collapse';
 import CloseIcon from '@material-ui/icons/Close';
 import Tabs from 'react-bootstrap/Tabs';
 import Tab from 'react-bootstrap/Tab';
-import {encryptLocalStorage, setLocalStorage} from '../utils/localStorageKeyGen';
+import { encryptLocalStorage, setLocalStorage } from '../utils/localStorageKeyGen';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 const CREATE_USER = gql`
 	mutation CreateUser($username: String!, $publicKey: String!){
@@ -50,14 +51,20 @@ const UPDATE_KEYS = gql`
 // register the user
 function Register() {
 	const [updateKeys] = useMutation(UPDATE_KEYS);
-	const [createUser] = useMutation(CREATE_USER);
+	const [createUser] = useMutation(CREATE_USER, {
+		onCompleted({ createUser }) {
+			const username = createUser.username;
+			const publicKey = createUser.publicKey;
+			createToken({ variables: { username, publicKey } });
+		}
+	});
 	const [createToken] = useMutation(CREATE_TOKEN, {
 		onCompleted({ createToken }) {
 			const password = tab === 'login' ? loginPassword : registerPassword;
 			localStorage.setItem('token', createToken.token);
 			localStorage.setItem('username', createToken.username);
 			localStorage.setItem('password', generatePasswordHash(password));
-			updateKeys({variables: {username: createToken.username, keys: encryptLocalStorage()}});
+			updateKeys({ variables: { username: createToken.username, keys: encryptLocalStorage() } });
 			window.location.href = window.location.href + 'main';
 		}
 	});
@@ -78,13 +85,15 @@ function Register() {
 	const [registerUsernameError, setRegisterUsernameError] = useState(false);
 	const [loginError, setLoginError] = useState(false);
 
+	const [buttonPressed, setButtonPressed] = useState(false);
+
 	const [tab, setTab] = useState('login');
 
-	const { loading, error, data } = useQuery(GET_USER, {
+	const { loading, error, data, refetch } = useQuery(GET_USER, {
 		variables: { username: tab === 'login' ? loginUsername : registerUsername },
 	});
 
-	function setKeys(myUsernameValue) {
+	const setKeys = async (myUsernameValue) => {
 		const username = tab === 'login' ? loginUsername : registerUsername;
 		const x = Promise.resolve(generateKeys(myUsernameValue)).then(function (array) {
 			const publicKey = array.publicKey
@@ -92,44 +101,51 @@ function Register() {
 			createUser({ variables: { username, publicKey } });
 			localStorage.setItem('user-publicKey', publicKey);
 			localStorage.setItem('user-privateKey', privateKey);
-			createToken({ variables: { username, publicKey } });
+			localStorage.setItem('username', username);
 		});
 	}
 
-	const registerUser = () => {
+	const registerUser = async () => {
+		const {data: userData} = await refetch({username: registerUsername});
 		if (error) {
 			setKeys(registerUsername);
 		}
 		else {
-			if (data.user === null) {
-				setRegisterUsernameError(false)
+			if (userData.user == null) {
+				setRegisterUsernameError(false);
 				setKeys(registerUsername);
 			}
 			else {
-				setRegisterUsernameError(true)
+				setRegisterUsernameError(true);
+				setButtonPressed(false);
 			}
 		}
 	}
 
-	const loginUser = () => {
+	const loginUser = async () => {
+		const {data: userData} = await refetch({username: loginUsername});
+		console.log(userData);
 		if (error) {
 			console.error(error);
 			setLoginError(true);
+			setButtonPressed(false);
 		}
 		else {
-			if (data.user === null) {
-				setLoginError(true)
+			if (userData.user === null) {				
+				setLoginError(true);
+				setButtonPressed(false);
 			}
 			else {
 				const hashedPassword = generatePasswordHash(loginPassword);
-				const success = setLocalStorage(data.user.keys, hashedPassword);
-				if (success){
+				const success = setLocalStorage(userData.user.keys, hashedPassword);
+				if (success) {
 					const username = localStorage.getItem('username');
 					const publicKey = localStorage.getItem('user-publicKey');
 					createLoginToken({ variables: { username, publicKey } });
 				}
-				else{
+				else {
 					setLoginError(true);
+					setButtonPressed(false);
 				}
 			}
 		}
@@ -171,11 +187,15 @@ function Register() {
 					/>
 					<br />
 					<br />
-					<Button onClick={(e) => {
+					<Button disabled={buttonPressed} onClick={(e) => {
 						e.preventDefault();
+						setButtonPressed(true);
 						loginUser()
 					}} variant="contained" color="secondary">
-						Login
+						{buttonPressed && <CircularProgress
+							size={20}
+							style={{ color: 'white', marginRight: '10px' }}
+						/>} Login
 			</Button>
 					<br />
 					<br />
@@ -230,11 +250,15 @@ function Register() {
 					/>
 					<br />
 					<br />
-					<Button onClick={(e) => {
+					<Button disabled={buttonPressed} onClick={(e) => {
 						e.preventDefault();
+						setButtonPressed(true);
 						registerUser();
 					}} variant="contained" color="secondary">
-						Register
+						{buttonPressed && <CircularProgress
+							size={20}
+							style={{ color: 'white', marginRight: '10px' }}
+						/>} Register
 			</Button>
 					<br />
 					<br />
