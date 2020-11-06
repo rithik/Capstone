@@ -72,6 +72,7 @@ function ChatMain({client}) {
     const [selectedGroup, setSelectedGroup] = useState(null);
     const [doneFetching, setDoneFetching] = useState(false)
     const [show, setShow] = useState(false);
+    const [subscriptions, setSubscriptions] = useState([]);
 
     const logout = () => {
         localStorage.clear();
@@ -114,7 +115,7 @@ function ChatMain({client}) {
                 border: "1px solid rgba(0,0,0,0.1)",
             }}>
                 {
-                    selectedGroup && <ChatMessages selectedGroup={selectedGroup} doneFetching={doneFetching} setDoneFetching={setDoneFetching}></ChatMessages>
+                    selectedGroup && <ChatMessages selectedGroup={selectedGroup} subscriptions={subscriptions} setSubscriptions={setSubscriptions} doneFetching={doneFetching} setDoneFetching={setDoneFetching}></ChatMessages>
                 }
             </div>
         </ThemeProvider>

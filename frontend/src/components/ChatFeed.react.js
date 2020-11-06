@@ -5,8 +5,7 @@ import ClipLoader from "react-spinners/ClipLoader";
 import { css } from "@emotion/core";
 import { gql, useMutation } from '@apollo/client';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {encryptMessage, decryptMessage, decryptMessageForPrivateKey} from '../utils/AESEncryption';
-import {encryptLocalStorage} from '../utils/localStorageKeyGen';
+import { encryptMessage, decryptMessage } from '../utils/AESEncryption';
 
 const override = css`
   display: block;
@@ -27,10 +26,8 @@ function ChatFeed({
     entries,
     onLoadMore,
     doneFetching,
-    subscribeToNewMessages,
-    selectedGroup
+    selectedGroup,
 }) {
-    const [firstLoad, setFirstLoad] = useState(true);
     const [messageInput, setMessageInput] = useState("");
     const [createMessage] = useMutation(SEND_MESSAGE);
     let messagesEndRef = React.createRef();
@@ -40,20 +37,16 @@ function ChatFeed({
     const reversedEntries = [].concat(entries.messagesByGroup).reverse();
     const username = localStorage.getItem('username');
     const messages = reversedEntries.map(message => {
-        console.log(message);
-        if (localStorage.getItem(`${selectedGroup}-privateKey`) == null || localStorage.getItem(`${selectedGroup}-privateKey`) === 'undefined'){
+        if (localStorage.getItem(`${selectedGroup}-privateKey`) == null || localStorage.getItem(`${selectedGroup}-privateKey`) === 'undefined') {
             return null;
         }
         return new Message({ id: message.sender === username ? 0 : message.sender, message: decryptMessage(message.content, selectedGroup).message, senderName: `@${message.sender}` })
     }).filter(Boolean);
 
+
     useEffect(() => {
-        if (firstLoad) {
-            messagesEndRef.scrollIntoView({ behavior: "smooth" });
-            subscribeToNewMessages();
-            setFirstLoad(false);
-        }
-        setInterval(() => {
+        messagesEndRef.scrollIntoView({ behavior: "smooth" });
+        const interval = setInterval(() => {
             const offset = 0;
             if (!messagesStartRef) return false;
             const top = messagesStartRef.getBoundingClientRect().top;
@@ -62,7 +55,11 @@ function ChatFeed({
                 onLoadMore();
             }
         }, 1000);
-    }, [firstLoad, setFirstLoad, onLoadMore, messagesStartRef, messagesEndRef]);
+        return function cleanup(){
+            clearInterval(interval);
+        }
+    }, [onLoadMore, messagesStartRef, messagesEndRef]);
+
     return <div style={{ marginLeft: '10px', marginRight: '10px', marginBottom: '50px' }}>
         <div style={{ height: '30px' }}
             ref={(el) => { messagesStartRef = el; }}>
@@ -97,11 +94,11 @@ function ChatFeed({
         <Form style={{ width: "68%", bottom: "20px", position: "fixed" }}>
             <Form.Group>
                 <Form.Control type="text" placeholder="Enter message" value={messageInput} onChange={e => setMessageInput(e.target.value)} onKeyPress={event => {
-                if (event.key === 'Enter') {
-                    event.preventDefault()
-                    createMessage({ variables: { username, gid: selectedGroup, content: encryptMessage(messageInput, "text", selectedGroup), cType: "text" } });
-                }
-              }}/>
+                    if (event.key === 'Enter') {
+                        event.preventDefault()
+                        createMessage({ variables: { username, gid: selectedGroup, content: encryptMessage(messageInput, "text", selectedGroup), cType: "text" } });
+                    }
+                }} />
             </Form.Group>
         </Form>
     </div>;
