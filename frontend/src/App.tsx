@@ -2,8 +2,7 @@ import React from 'react';
 import './App.css';
 import Register from './components/register.react'
 import {
-  BrowserRouter as Router,
-  Switch,
+  Switch, 
   Route,
   HashRouter
 } from "react-router-dom";

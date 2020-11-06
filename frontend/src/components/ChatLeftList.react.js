@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 
 import {
   gql,
@@ -38,13 +38,12 @@ const GROUP_SUBSCRIPTION = gql`
 
 function ChatLeftList({ selectedGroup, setSelectedGroup, setDoneFetching, client }) {
   const username = localStorage.getItem('username');
-  const [firstLoad, setFirstLoad] = useState(false);
 
   const {
     subscribeToMore,
     loading,
     error,
-    data, 
+    data,
     refetch
   } = useQuery(GET_GROUPS, {
     variables: {
@@ -52,8 +51,8 @@ function ChatLeftList({ selectedGroup, setSelectedGroup, setDoneFetching, client
     }
   });
 
-  const subscribeToNewMessages = () => {
-    subscribeToMore({
+  useEffect(() => {
+    const subscribe = subscribeToMore({
       document: GROUP_SUBSCRIPTION,
       variables: { username },
       updateQuery: (prev, { subscriptionData }) => {
@@ -64,26 +63,22 @@ function ChatLeftList({ selectedGroup, setSelectedGroup, setDoneFetching, client
           groupsByUser: [newGroup, ...prev.groupsByUser]
         });
       }
-    })
-  };
-
-  useEffect(() => {
-    if (!firstLoad) {
-      setFirstLoad(true);
-      subscribeToNewMessages();
-    }
-  }, [firstLoad]);
+    });
+    return function cleanup() {
+      subscribe();
+    };
+  }, [subscribeToMore, username]);
 
 
   if (loading) return 'Loading...';
-  if (error){
+  if (error) {
     client.resetStore();
     refetch();
     return `Error! ${error.message}`;
   }
 
   const groupDivs = data.groupsByUser.map(group => {
-    if (localStorage.getItem(`${group.id}-privateKey`) == null || localStorage.getItem(`${group.id}-privateKey`) == 'undefined') {
+    if (localStorage.getItem(`${group.id}-privateKey`) == null || localStorage.getItem(`${group.id}-privateKey`) === 'undefined') {
       localStorage.setItem(`${group.id}-privateKey`, decryptMessageForPrivateKey(group.privateKey));
     }
     const users = group.users.map(user => `@${user.username}`);

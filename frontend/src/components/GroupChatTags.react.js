@@ -72,7 +72,7 @@ function GroupChatTags({ show, setShow }) {
         }
         var tags = raw_tags.filter(onlyUnique);
         if (tags && tags.length > 0) {
-            const x = Promise.resolve(generateKeys(groupName, 256)).then(function (array) {
+            Promise.resolve(generateKeys(groupName, 256)).then(function (array) {
                 const publicKey = array.publicKey
                 const privateKey = array.privateKey
                 localStorage.setItem('temp-group-privatekey', privateKey);
