@@ -85,7 +85,7 @@ function ChatLeftList({ selectedGroup, setSelectedGroup, setDoneFetching, client
     return (
       <div key={group.id} onClick={() => { setSelectedGroup(group.id); setDoneFetching(false) }}>
         <ChatListItem active={group.id === selectedGroup}>
-          <Avatar letter={group.name.charAt(0).toUpperCase()} />
+          <Avatar letter={group.name.charAt(0).toUpperCase()} style={{color: '#121212'}}/>
           <Column fill="true">
             <Row justify>
               <Title ellipsis>{group.name}</Title>
