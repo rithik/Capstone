@@ -102,7 +102,7 @@ function ChatMain({ client }) {
         window.location.href = baseURL;
     }
 
-    return (<>
+    return (<div className="main">
         <GroupChatTags show={show} setShow={setShow} />
         <ThemeProvider theme={themes.defaultTheme}>
             <div style={{
@@ -133,9 +133,8 @@ function ChatMain({ client }) {
                 zIndex: 1,
                 top: 0,
                 overflowX: 'hidden',
-                paddingTop: '20px',
                 right: 0,
-                border: "1px solid rgba(0,0,0,0.1)",
+                border: "1px solid rgba(108, 117, 125, 0.1)",
             }}>
                 {
                     selectedGroup && (
@@ -156,7 +155,7 @@ function ChatMain({ client }) {
                     )}
             </div>
         </ThemeProvider>
-    </>);
+    </div>);
 }
 
 export default ChatMain;

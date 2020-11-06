@@ -85,24 +85,24 @@ function GroupChatTags({ show, setShow }) {
     }
 
     return (
-        <div>
+        <div style={{backgroundColor: "#2e2e2e"}}>
             <Modal show={show} transparent={"true"} onHide={handleClose}>
-                <Modal.Header closeButton>
+                <Modal.Header closeButton style={{backgroundColor: "#2e2e2e"}}>
                     <Modal.Title>Input the individuals to add to your new Group Chat!</Modal.Title>
                 </Modal.Header>
 
-                <Modal.Body>
-                    <TagsInput value={tags} onChange={(newTags) => setTags(newTags)} inputProps={{
+                <Modal.Body style={{backgroundColor: "#2e2e2e"}}>
+                    <TagsInput style={{backgroundColor: "#6c757d", color: "white"}} value={tags} onChange={(newTags) => setTags(newTags)} inputProps={{
                         className: 'react-tagsinput-input',
                         placeholder: 'Add people!'
                     }} onlyUnique />
                     <Form style={{marginTop: "20px"}}>
                         <Form.Group>
-                            <Form.Control type="text" placeholder="GroupName" value={groupName} onChange={(e) => setgroupName(e.target.value)} />
+                            <Form.Control testid={"createGroupInputField"} style={{backgroundColor: "#6c757d", color: "white"}} type="text" placeholder="GroupName" value={groupName} onChange={(e) => setgroupName(e.target.value)} />
                         </Form.Group>
                     </Form>
                 </Modal.Body>
-                <Modal.Footer>
+                <Modal.Footer style={{backgroundColor: "#2e2e2e"}}>
                     <Button variant="secondary" onClick={handleClose}>
                         Close
                     </Button>
