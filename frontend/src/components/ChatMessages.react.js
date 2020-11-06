@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import {
     gql,
@@ -15,6 +15,7 @@ const GET_MESSAGES = gql`
             content
             ts
             sender
+            group
             cType
         }
     }
@@ -27,6 +28,7 @@ const MESSAGE_SUBSCRIPTION = gql`
             content
             ts
             sender
+            group
             cType
         }
     }
@@ -39,7 +41,7 @@ const override = css`
 `;
 
 function ChatMessages({
-    selectedGroup, doneFetching, setDoneFetching
+    selectedGroup, doneFetching, setDoneFetching, subscriptions, setSubscriptions
 }) {
     const { subscribeToMore, loading, error, data, fetchMore } = useQuery(
         GET_MESSAGES,
@@ -52,6 +54,25 @@ function ChatMessages({
             fetchPolicy: "cache-and-network"
         }
     );
+
+    useEffect(() => {
+        const subscription = subscribeToMore({
+            document: MESSAGE_SUBSCRIPTION,
+            variables: { gid: selectedGroup },
+            updateQuery: (prev, { subscriptionData }) => {
+                if (!subscriptionData.data) return prev;
+                console.log(subscriptionData, selectedGroup);
+                const newFeedItem = subscriptionData.data.newMessage;
+                return Object.assign({}, prev, {
+                    messagesByGroup: [newFeedItem, ...prev.messagesByGroup]
+                });
+            }
+        });
+        return function cleanup() {
+            subscription();
+        };
+    }, [subscribeToMore, selectedGroup]);
+
     if (loading) return (<div style={{ marginLeft: '10px', marginRight: '10px', marginBottom: '50px' }}>
         <div style={{ height: '30px' }}>
             {
@@ -82,21 +103,7 @@ function ChatMessages({
                 });
             }
         })
-    }}
-        subscribeToNewMessages={() =>
-            subscribeToMore({
-                document: MESSAGE_SUBSCRIPTION,
-                variables: { gid: selectedGroup },
-                updateQuery: (prev, { subscriptionData }) => {
-                    if (!subscriptionData.data) return prev;
-                    const newFeedItem = subscriptionData.data.newMessage;
-                    return Object.assign({}, prev, {
-                        messagesByGroup: [newFeedItem, ...prev.messagesByGroup]
-                    });
-                }
-            })
-        }
-    >
+    }}>
     </ChatFeed>;
 }
 
