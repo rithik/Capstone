@@ -7,6 +7,7 @@ import {
     gql,
     useMutation
 } from '@apollo/client';
+import Avatar from 'react-avatar';
 
 import { ThemeProvider, darkTheme, elegantTheme, purpleTheme, defaultTheme } from '@livechat/ui-kit'
 import GroupChatTags from './GroupChatTags.react';
@@ -114,6 +115,9 @@ function ChatMain({ client }) {
                 paddingTop: '20px',
                 left: 0
             }}>
+                <div style={{ verticalAlign: 'middle', fontSize: 24 }}>
+                    <Avatar name={username} size={50} round style={{ marginBottom: 20, marginLeft: 25 }} title={`@${username}`} /> {`@${username}`}
+                </div>
                 <div className="App">
                     <Button variant="primary" style={{ marginRight: "10px" }} onClick={() => setShow(!show)}>Create Group Chat</Button>
                     <Button variant="secondary" onClick={logout}>Logout</Button>
@@ -140,7 +144,7 @@ function ChatMain({ client }) {
                             <Form style={{ width: "68%", bottom: "20px", position: "fixed", marginLeft: '0', marginRight: '0', display: "block", left: "31%" }}>
                                 <Form.Group>
                                     <Form.Control type="text" placeholder="Enter message" value={messageInput} onChange={e => setMessageInput(e.target.value)} onKeyPress={event => {
-                                        if (event.key === 'Enter') {
+                                        if (event.key === 'Enter' && event.target.value !== "") {
                                             event.preventDefault()
                                             createMessage({ variables: { username, gid: selectedGroup, content: encryptMessage(messageInput, "text", selectedGroup), cType: "text" } });
                                             setMessageInput("");
