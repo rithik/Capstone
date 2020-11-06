@@ -137,7 +137,7 @@ function ChatMain({ client }) {
                     selectedGroup && (
                         <>
                             <ChatMessages selectedGroup={selectedGroup} doneFetching={doneFetching} setDoneFetching={setDoneFetching} />
-                            <Form style={{ width: "68%", bottom: "20px", position: "fixed" }}>
+                            <Form style={{ width: "68%", bottom: "20px", position: "fixed", marginLeft: '0', marginRight: '0', display: "block", left: "31%" }}>
                                 <Form.Group>
                                     <Form.Control type="text" placeholder="Enter message" value={messageInput} onChange={e => setMessageInput(e.target.value)} onKeyPress={event => {
                                         if (event.key === 'Enter') {
