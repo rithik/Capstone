@@ -89,13 +89,13 @@ function Register() {
 
 	const [tab, setTab] = useState('login');
 
-	const { loading, error, data, refetch } = useQuery(GET_USER, {
+	const { error, refetch } = useQuery(GET_USER, {
 		variables: { username: tab === 'login' ? loginUsername : registerUsername },
 	});
 
 	const setKeys = async (myUsernameValue) => {
 		const username = tab === 'login' ? loginUsername : registerUsername;
-		const x = Promise.resolve(generateKeys(myUsernameValue, 4096)).then(function (array) {
+		Promise.resolve(generateKeys(myUsernameValue, 4096)).then(function (array) {
 			const publicKey = array.publicKey
 			const privateKey = array.privateKey
 			createUser({ variables: { username, publicKey } });

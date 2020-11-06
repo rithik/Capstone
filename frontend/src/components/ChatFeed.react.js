@@ -51,7 +51,7 @@ function ChatFeed({
             if (!messagesStartRef) return false;
             const top = messagesStartRef.getBoundingClientRect().top;
             const inView = (top + offset) >= 0 && (top - offset) <= window.innerHeight;
-            if (inView && !doneFetching) {
+            if (inView) {
                 onLoadMore();
             }
         }, 1000);
