@@ -1,25 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import Form from 'react-bootstrap/Form';
+import React, { useEffect } from 'react';
 import { ChatFeed as ChatFeedUI, Message } from 'react-chat-ui';
 import ClipLoader from "react-spinners/ClipLoader";
 import { css } from "@emotion/core";
-import { gql, useMutation } from '@apollo/client';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { encryptMessage, decryptMessage } from '../utils/AESEncryption';
+import { decryptMessage } from '../utils/AESEncryption';
 
 const override = css`
   display: block;
   margin: 0 auto;
   border-color: red;
-`;
-const SEND_MESSAGE = gql`
-    mutation SendMessage($username: String!, $content: String!, $gid: Int!, $cType: String!){
-        createMessage(sender:$username, group:$gid, content:$content, cType:$cType){
-            id
-            content
-            ts
-        }
-    }
 `;
 
 function ChatFeed({
@@ -28,8 +17,6 @@ function ChatFeed({
     doneFetching,
     selectedGroup,
 }) {
-    const [messageInput, setMessageInput] = useState("");
-    const [createMessage] = useMutation(SEND_MESSAGE);
     let messagesEndRef = React.createRef();
     let messagesStartRef = React.createRef();
 
@@ -91,16 +78,6 @@ function ChatFeed({
         <div style={{ float: "left", clear: "both" }}
             ref={(el) => { messagesEndRef = el; }}>
         </div>
-        <Form style={{ width: "68%", bottom: "20px", position: "fixed" }}>
-            <Form.Group>
-                <Form.Control type="text" placeholder="Enter message" value={messageInput} onChange={e => setMessageInput(e.target.value)} onKeyPress={event => {
-                    if (event.key === 'Enter') {
-                        event.preventDefault()
-                        createMessage({ variables: { username, gid: selectedGroup, content: encryptMessage(messageInput, "text", selectedGroup), cType: "text" } });
-                    }
-                }} />
-            </Form.Group>
-        </Form>
     </div>;
 }
 

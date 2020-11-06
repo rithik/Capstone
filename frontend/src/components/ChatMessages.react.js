@@ -41,7 +41,7 @@ const override = css`
 `;
 
 function ChatMessages({
-    selectedGroup, doneFetching, setDoneFetching, subscriptions, setSubscriptions
+    selectedGroup, doneFetching, setDoneFetching
 }) {
     const { subscribeToMore, loading, error, data, fetchMore } = useQuery(
         GET_MESSAGES,
