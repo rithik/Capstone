@@ -3,10 +3,26 @@ import ChatLeftList from './ChatLeftList.react';
 import ChatMessages from './ChatMessages.react';
 import Button from 'react-bootstrap/Button';
 import './../App.css';
+import {
+    gql,
+    useMutation
+} from '@apollo/client';
 
 import { ThemeProvider, darkTheme, elegantTheme, purpleTheme, defaultTheme } from '@livechat/ui-kit'
 import GroupChatTags from './GroupChatTags.react';
+import Form from 'react-bootstrap/Form';
+import { encryptMessage } from '../utils/AESEncryption';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
+const SEND_MESSAGE = gql`
+    mutation SendMessage($username: String!, $content: String!, $gid: Int!, $cType: String!){
+        createMessage(sender:$username, group:$gid, content:$content, cType:$cType){
+            id
+            content
+            ts
+        }
+    }
+`;
 const themes = {
     defaultTheme: {
         FixedWrapperMaximized: {
@@ -68,7 +84,11 @@ const themes = {
     },
 }
 
-function ChatMain({client}) {
+function ChatMain({ client }) {
+    const username = localStorage.getItem('username');
+    const [messageInput, setMessageInput] = useState("");
+    const [createMessage] = useMutation(SEND_MESSAGE);
+
     const [selectedGroup, setSelectedGroup] = useState(null);
     const [doneFetching, setDoneFetching] = useState(false)
     const [show, setShow] = useState(false);
@@ -82,7 +102,7 @@ function ChatMain({client}) {
     }
 
     return (<>
-    <GroupChatTags show={show} setShow={setShow} />
+        <GroupChatTags show={show} setShow={setShow} />
         <ThemeProvider theme={themes.defaultTheme}>
             <div style={{
                 height: "100%",
@@ -114,8 +134,22 @@ function ChatMain({client}) {
                 border: "1px solid rgba(0,0,0,0.1)",
             }}>
                 {
-                    selectedGroup && <ChatMessages selectedGroup={selectedGroup} doneFetching={doneFetching} setDoneFetching={setDoneFetching}></ChatMessages>
-                }
+                    selectedGroup && (
+                        <>
+                            <ChatMessages selectedGroup={selectedGroup} doneFetching={doneFetching} setDoneFetching={setDoneFetching} />
+                            <Form style={{ width: "68%", bottom: "20px", position: "fixed" }}>
+                                <Form.Group>
+                                    <Form.Control type="text" placeholder="Enter message" value={messageInput} onChange={e => setMessageInput(e.target.value)} onKeyPress={event => {
+                                        if (event.key === 'Enter') {
+                                            event.preventDefault()
+                                            createMessage({ variables: { username, gid: selectedGroup, content: encryptMessage(messageInput, "text", selectedGroup), cType: "text" } });
+                                            setMessageInput("");
+                                        }
+                                    }} />
+                                </Form.Group>
+                            </Form>
+                        </>
+                    )}
             </div>
         </ThemeProvider>
     </>);
