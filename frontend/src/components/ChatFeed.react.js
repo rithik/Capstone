@@ -46,12 +46,13 @@ function ChatFeed({
             clearInterval(interval);
         }
     }, [onLoadMore, messagesStartRef, messagesEndRef]);
-
+    const height = window.innerHeight * 0.8
     return <div style={{ marginLeft: '10px', marginRight: '10px', marginBottom: '50px' }}>
+        
         <div style={{ height: '30px' }}
-            ref={(el) => { messagesStartRef = el; }}>
+            ref={(el) => { messagesStartRef = el; }}> 
             {
-                !doneFetching && <ClipLoader
+                doneFetching ?selectedGroup: <ClipLoader
                     css={override}
                     size={30}
                     color={"#123abc"}
@@ -59,22 +60,25 @@ function ChatFeed({
                 />
             }
         </div>
-        <ChatFeedUI
-            messages={messages}
-            showSenderName
-            bubblesCentered={false}
-            bubbleStyles={
-                {
-                    text: {
-                        fontSize: 14
-                    },
-                    chatbubble: {
-                        borderRadius: 30,
-                        padding: 15
+        <div style={{maxHeight :height}}>
+            <ChatFeedUI
+                maxHeight = {height}                
+                messages={messages}
+                showSenderName
+                bubblesCentered={false}
+                bubbleStyles={
+                    {
+                        text: {
+                            fontSize: 14
+                        },
+                        chatbubble: {
+                            borderRadius: 30,
+                            padding: 15
+                        }
                     }
                 }
-            }
-        />
+            />
+        </div>
         <div style={{ float: "left", clear: "both" }}
             ref={(el) => { messagesEndRef = el; }}>
         </div>
