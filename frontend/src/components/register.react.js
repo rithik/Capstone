@@ -12,6 +12,40 @@ import Tabs from 'react-bootstrap/Tabs';
 import Tab from 'react-bootstrap/Tab';
 import { encryptLocalStorage, setLocalStorage } from '../utils/localStorageKeyGen';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
+
+
+const customTheme = createMuiTheme({
+	overrides: {
+		MuiFormLabel: { root: { color: 'white', borderColor: 'white' } },
+		MuiOutlinedInput: {
+			root: {
+				'& $notchedOutline': {
+					borderColor: 'rgba(255, 255, 255, 0.23)',
+				},
+				'&:hover:not($disabled):not($focused):not($error) $notchedOutline': {
+					borderColor: '#4A90E2',
+					'@media (hover: none)': {
+						borderColor: 'rgba(255, 255, 255, 0.23)',
+					},
+				},
+				'&$focused $notchedOutline': {
+					borderColor: '#4A90E2',
+					borderWidth: 1,
+				},
+			}
+		},
+		MuiInput: {
+			input: {
+				"&::placeholder": {
+					color: "gray"
+				},
+				color: "white", // if you also want to change the color of the input, this is the prop you'd use
+			}
+		}
+	}
+});
+
 
 const CREATE_USER = gql`
 	mutation CreateUser($username: String!, $publicKey: String!){
@@ -106,7 +140,7 @@ function Register() {
 	}
 
 	const registerUser = async () => {
-		const {data: userData} = await refetch({username: registerUsername});
+		const { data: userData } = await refetch({ username: registerUsername });
 		if (error) {
 			setKeys(registerUsername);
 		}
@@ -123,7 +157,7 @@ function Register() {
 	}
 
 	const loginUser = async () => {
-		const {data: userData} = await refetch({username: loginUsername});
+		const { data: userData } = await refetch({ username: loginUsername });
 		console.log(userData);
 		if (error) {
 			console.error(error);
@@ -131,7 +165,7 @@ function Register() {
 			setButtonPressed(false);
 		}
 		else {
-			if (userData.user === null) {				
+			if (userData.user === null) {
 				setLoginError(true);
 				setButtonPressed(false);
 			}
@@ -152,139 +186,141 @@ function Register() {
 	}
 
 	return (
-		<Tabs fill={true}
-			id="controlled-tab-example"
-			className="tabHeadings"
-			activeKey={tab}
-			onSelect={(k) => setTab(k)}
-		>
-			<Tab eventKey="login" title="Login">
-				<div className="register">
-					<TextField
-						InputProps={{
-							style: { color: "black" },
-						}}
-						id="outlined-basic" label="Username"
-						variant="outlined"
-						value={loginUsername}
-						color={'secondary'}
-						fullWidth={true}
-						onChange={(e) => setLoginUsername(e.target.value)}
-					/>
-					<br />
-					<br />
-					<TextField
-						InputProps={{
-							style: { color: "black" },
-						}}
-						id="outlined-basic" label="Password"
-						variant="outlined"
-						value={loginPassword}
-						type="password"
-						color={'secondary'}
-						fullWidth={true}
-						onChange={(e) => setLoginPassword(e.target.value)}
-					/>
-					<br />
-					<br />
-					<Button disabled={buttonPressed} onClick={(e) => {
-						e.preventDefault();
-						setButtonPressed(true);
-						loginUser()
-					}} variant="contained" color="secondary">
-						{buttonPressed && <CircularProgress
-							size={20}
-							style={{ color: 'white', marginRight: '10px' }}
-						/>} Login
+		<ThemeProvider theme={customTheme}>
+			<Tabs fill={true}
+				id="controlled-tab-example"
+				className="tabHeadings"
+				activeKey={tab}
+				onSelect={(k) => setTab(k)}
+			>
+				<Tab eventKey="login" title="Login">
+					<div className="register">
+						<TextField
+							InputProps={{
+								style: { color: "white" },
+							}}
+							id="outlined-basic" label="Username"
+							variant="outlined"
+							value={loginUsername}
+							color={'secondary'}
+							fullWidth={true}
+							onChange={(e) => setLoginUsername(e.target.value)}
+						/>
+						<br />
+						<br />
+						<TextField
+							InputProps={{
+								style: { color: "white" },
+							}}
+							id="outlined-basic" label="Password"
+							variant="outlined"
+							value={loginPassword}
+							type="password"
+							color={'secondary'}
+							fullWidth={true}
+							onChange={(e) => setLoginPassword(e.target.value)}
+						/>
+						<br />
+						<br />
+						<Button disabled={buttonPressed} onClick={(e) => {
+							e.preventDefault();
+							setButtonPressed(true);
+							loginUser()
+						}} variant="contained" color="secondary">
+							{buttonPressed && <CircularProgress
+								size={20}
+								style={{ color: 'white', marginRight: '10px' }}
+							/>} Login
 			</Button>
-					<br />
-					<br />
-					<Collapse in={loginError}>
-						<Alert
-							action={
-								<IconButton
-									aria-label="close"
-									color="inherit"
-									size="small"
-									onClick={() => {
-										setLoginError(false);
-									}}
-								>
-									<CloseIcon fontSize="inherit" />
-								</IconButton>
-							}
-							variant="filled" severity="error"
-						>
-							Invalid Login
+						<br />
+						<br />
+						<Collapse in={loginError}>
+							<Alert
+								action={
+									<IconButton
+										aria-label="close"
+										color="inherit"
+										size="small"
+										onClick={() => {
+											setLoginError(false);
+										}}
+									>
+										<CloseIcon fontSize="inherit" />
+									</IconButton>
+								}
+								variant="filled" severity="error"
+							>
+								Invalid Login
 				</Alert>
-					</Collapse>
+						</Collapse>
 
-				</div>
-			</Tab>
-			<Tab eventKey="register" title="Register">
-				<div className="register">
-					<TextField
-						InputProps={{
-							style: { color: "black" },
-						}}
-						id="outlined-basic" label="Username"
-						variant="outlined"
-						value={registerUsername}
-						color={'secondary'}
-						fullWidth={true}
-						onChange={(e) => setRegisterUsername(e.target.value)}
-					/>
-					<br />
-					<br />
-					<TextField
-						InputProps={{
-							style: { color: "black" },
-						}}
-						id="outlined-basic" label="Password"
-						variant="outlined"
-						value={registerPassword}
-						type="password"
-						color={'secondary'}
-						fullWidth={true}
-						onChange={(e) => setRegisterPassword(e.target.value)}
-					/>
-					<br />
-					<br />
-					<Button disabled={buttonPressed} onClick={(e) => {
-						e.preventDefault();
-						setButtonPressed(true);
-						registerUser();
-					}} variant="contained" color="secondary">
-						{buttonPressed && <CircularProgress
-							size={20}
-							style={{ color: 'white', marginRight: '10px' }}
-						/>} Register
+					</div>
+				</Tab>
+				<Tab eventKey="register" title="Register">
+					<div className="register">
+						<TextField
+							InputProps={{
+								style: { color: "white" },
+							}}
+							id="outlined-basic" label="Username"
+							variant="outlined"
+							value={registerUsername}
+							color={'secondary'}
+							fullWidth={true}
+							onChange={(e) => setRegisterUsername(e.target.value)}
+						/>
+						<br />
+						<br />
+						<TextField
+							InputProps={{
+								style: { color: "white" },
+							}}
+							id="outlined-basic" label="Password"
+							variant="outlined"
+							value={registerPassword}
+							type="password"
+							color={'secondary'}
+							fullWidth={true}
+							onChange={(e) => setRegisterPassword(e.target.value)}
+						/>
+						<br />
+						<br />
+						<Button disabled={buttonPressed} onClick={(e) => {
+							e.preventDefault();
+							setButtonPressed(true);
+							registerUser();
+						}} variant="contained" color="secondary">
+							{buttonPressed && <CircularProgress
+								size={20}
+								style={{ color: 'white', marginRight: '10px' }}
+							/>} Register
 			</Button>
-					<br />
-					<br />
-					<Collapse in={registerUsernameError}>
-						<Alert
-							action={
-								<IconButton
-									aria-label="close"
-									color="inherit"
-									size="small"
-									onClick={() => {
-										setRegisterUsernameError(false);
-									}}
-								>
-									<CloseIcon fontSize="inherit" />
-								</IconButton>
-							}
-							variant="filled" severity="error"
-						>
-							Invalid username - choose a unique username
+						<br />
+						<br />
+						<Collapse in={registerUsernameError}>
+							<Alert
+								action={
+									<IconButton
+										aria-label="close"
+										color="inherit"
+										size="small"
+										onClick={() => {
+											setRegisterUsernameError(false);
+										}}
+									>
+										<CloseIcon fontSize="inherit" />
+									</IconButton>
+								}
+								variant="filled" severity="error"
+							>
+								Invalid username - choose a unique username
 				</Alert>
-					</Collapse>
+						</Collapse>
 
-				</div>
-			</Tab>
-		</Tabs>
+					</div>
+				</Tab>
+			</Tabs>
+		</ThemeProvider>
 	);
 }
 
