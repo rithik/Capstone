@@ -64,6 +64,10 @@ const themes = {
     },
     darkTheme: {
         ...darkTheme,
+        vars: {
+            ...darkTheme.vars,
+            "tertiary-color": "rgba(40, 40, 40, 0.8)"
+        },
         Message: {
             ...darkTheme.Message,
             css: {
@@ -86,6 +90,7 @@ const themes = {
 }
 
 function ChatMain({ client }) {
+    console.log(themes.darkTheme);
     const username = localStorage.getItem('username');
     const [messageInput, setMessageInput] = useState("");
     const [createMessage] = useMutation(SEND_MESSAGE);
@@ -104,7 +109,7 @@ function ChatMain({ client }) {
 
     return (<div className="main">
         <GroupChatTags show={show} setShow={setShow} />
-        <ThemeProvider theme={themes.defaultTheme}>
+        <ThemeProvider theme={themes.darkTheme}>
             <div style={{
                 height: "100%",
                 width: "30%",
@@ -118,7 +123,7 @@ function ChatMain({ client }) {
                 <div style={{ verticalAlign: 'middle', fontSize: 24 }}>
                     <Avatar name={username} size={50} round style={{ marginBottom: 20, marginLeft: 25 }} title={`@${username}`} /> {`@${username}`}
                 </div>
-                <div className="App">
+                <div className="App" style={{marginBottom: 10}}>
                     <Button variant="primary" style={{ marginRight: "10px" }} onClick={() => setShow(!show)}>Create Group Chat</Button>
                     <Button variant="secondary" onClick={logout}>Logout</Button>
                 </div>
@@ -142,7 +147,7 @@ function ChatMain({ client }) {
                             <ChatMessages selectedGroup={selectedGroup} doneFetching={doneFetching} setDoneFetching={setDoneFetching} />
                             <Form style={{ width: "68%", bottom: "20px", position: "fixed", marginLeft: '0', marginRight: '0', display: "block", left: "31%" }}>
                                 <Form.Group>
-                                    <Form.Control type="text" placeholder="Enter message" value={messageInput} onChange={e => setMessageInput(e.target.value)} onKeyPress={event => {
+                                    <Form.Control type="text" placeholder="Enter message" value={messageInput} style={{backgroundColor: "#363636", color: "white", borderColor: "#363636"}} onChange={e => setMessageInput(e.target.value)} onKeyPress={event => {
                                         if (event.key === 'Enter' && event.target.value !== "") {
                                             event.preventDefault()
                                             createMessage({ variables: { username, gid: selectedGroup, content: encryptMessage(messageInput, "text", selectedGroup), cType: "text" } });

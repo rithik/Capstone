@@ -83,7 +83,7 @@ function ChatLeftList({ selectedGroup, setSelectedGroup, setDoneFetching, client
     }
     const users = group.users.map(user => `@${user.username}`);
     return (
-      <div key={group.id} onClick={() => { setSelectedGroup(group.id); setDoneFetching(false) }}>
+      <div key={group.id} style={group.id === selectedGroup ? {backgroundColor: "#0275d8"} : {}} onClick={() => { setSelectedGroup(group.id); setDoneFetching(false) }}>
         <ChatListItem active={group.id === selectedGroup}>
           <Avatar letter={group.name.charAt(0).toUpperCase()} style={{color: '#121212'}}/>
           <Column fill="true">

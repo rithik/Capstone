@@ -21,6 +21,14 @@
   color: skyblue;
 }
 
+.MuiTextField-root{
+  /* color: white; */
+}
+
+.MuiFormLabel-root{
+  color: white;
+}
+
 .App-header {
   /* background-color: #282c34; */
   min-height: 100vh;
