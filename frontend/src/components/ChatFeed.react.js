@@ -1,9 +1,8 @@
 import React, { useEffect } from 'react';
-import { ChatFeed as ChatFeedUI, Message } from 'react-chat-ui';
+import { ChatFeed as ChatFeedUI } from 'react-chat-ui';
 import ClipLoader from "react-spinners/ClipLoader";
 import { css } from "@emotion/core";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { decryptMessage } from '../utils/AESEncryption';
 
 const override = css`
   display: block;
@@ -12,7 +11,7 @@ const override = css`
 `;
 
 function ChatFeed({
-    entries,
+    messages,
     onLoadMore,
     doneFetching,
     selectedGroup,
@@ -21,15 +20,6 @@ function ChatFeed({
     let messagesStartRef = React.createRef();
 
     window.lm = onLoadMore;
-    const reversedEntries = [].concat(entries.messagesByGroup).reverse();
-    const username = localStorage.getItem('username');
-    const messages = reversedEntries.map(message => {
-        if (localStorage.getItem(`${selectedGroup}-privateKey`) == null || localStorage.getItem(`${selectedGroup}-privateKey`) === 'undefined') {
-            return null;
-        }
-        return new Message({ id: message.sender === username ? 0 : message.sender, message: decryptMessage(message.content, selectedGroup).message, senderName: `@${message.sender}` })
-    }).filter(Boolean);
-
 
     useEffect(() => {
         messagesEndRef.scrollIntoView({ behavior: "smooth" });
@@ -39,13 +29,14 @@ function ChatFeed({
             const top = messagesStartRef.getBoundingClientRect().top;
             const inView = (top + offset) >= 0 && (top - offset) <= window.innerHeight;
             if (inView) {
-                onLoadMore();
+                // onLoadMore();
             }
         }, 1000);
         return function cleanup(){
             clearInterval(interval);
         }
     }, [onLoadMore, messagesStartRef, messagesEndRef]);
+
     const height = window.innerHeight * 0.86
     return <div style={{ marginLeft: 5, marginRight: 5, marginBottom: 50 }}>
         

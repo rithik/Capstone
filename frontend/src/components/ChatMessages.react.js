@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import {
     gql,
@@ -7,6 +7,8 @@ import {
 import { css } from "@emotion/core";
 import ClipLoader from "react-spinners/ClipLoader";
 import ChatFeed from './ChatFeed.react';
+import { decryptMessage } from '../utils/AESEncryption';
+import { Message } from 'react-chat-ui';
 
 const GET_MESSAGES = gql`
     query getMessagesForGroup($gid: Int!, $offset: Int, $limit: Int) {
@@ -43,6 +45,7 @@ const override = css`
 function ChatMessages({
     selectedGroup, doneFetching, setDoneFetching
 }) {
+    const [messages, setMessages] = useState([]);
     const { subscribeToMore, loading, error, data, fetchMore } = useQuery(
         GET_MESSAGES,
         {
@@ -56,6 +59,17 @@ function ChatMessages({
     );
 
     useEffect(() => {
+        const username = localStorage.getItem('username');
+        if (messages.length === 0 && data) {
+            const reversedEntries = [].concat(data.messagesByGroup).reverse();
+            const messageObjects = reversedEntries.map(message => {
+                if (localStorage.getItem(`${selectedGroup}-privateKey`) == null || localStorage.getItem(`${selectedGroup}-privateKey`) === 'undefined') {
+                    return null;
+                }
+                return new Message({ id: message.sender === username ? 0 : message.sender, message: decryptMessage(message.content, selectedGroup).message, senderName: `@${message.sender}` })
+            }).filter(Boolean);
+            setMessages(messageObjects);
+        }
         const subscription = subscribeToMore({
             document: MESSAGE_SUBSCRIPTION,
             variables: { gid: selectedGroup },
@@ -63,6 +77,8 @@ function ChatMessages({
                 if (!subscriptionData.data) return prev;
                 console.log(subscriptionData, selectedGroup);
                 const newFeedItem = subscriptionData.data.newMessage;
+                const newMessage = new Message({ id: newFeedItem.sender === username ? 0 : newFeedItem.sender, message: decryptMessage(newFeedItem.content, selectedGroup).message, senderName: `@${newFeedItem.sender}` });
+                setMessages(messages => [...messages, newMessage]);
                 return Object.assign({}, prev, {
                     messagesByGroup: [newFeedItem, ...prev.messagesByGroup]
                 });
@@ -71,7 +87,7 @@ function ChatMessages({
         return function cleanup() {
             subscription();
         };
-    }, [subscribeToMore, selectedGroup]);
+    }, [subscribeToMore, selectedGroup, data]);
 
     if (loading) return (<div style={{ marginLeft: '10px', marginRight: '10px', marginBottom: '50px' }}>
         <div style={{ height: '30px' }}>
@@ -86,7 +102,7 @@ function ChatMessages({
         </div>
     </div>);
     if (error) return `Error! ${error.message}`;
-    return <ChatFeed entries={data} selectedGroup={selectedGroup} doneFetching={doneFetching} onLoadMore={() => {
+    return <ChatFeed messages={messages} selectedGroup={selectedGroup} doneFetching={doneFetching} onLoadMore={() => {
         if (doneFetching) {
             return;
         }
@@ -98,6 +114,15 @@ function ChatMessages({
                 if (fetchMoreResult.messagesByGroup.length === 0) {
                     setDoneFetching(true);
                 }
+                const futureMessages = fetchMoreResult.messagesByGroup;
+                const username = localStorage.getItem('username');
+                const messageObjects = futureMessages.map(message => {
+                    if (localStorage.getItem(`${selectedGroup}-privateKey`) == null || localStorage.getItem(`${selectedGroup}-privateKey`) === 'undefined') {
+                        return null;
+                    }
+                    return new Message({ id: message.sender === username ? 0 : message.sender, message: decryptMessage(message.content, selectedGroup).message, senderName: `@${message.sender}` })
+                }).filter(Boolean);
+                setMessages(messages => [...messages, ...messageObjects]);
                 return Object.assign({}, prev, {
                     messagesByGroup: [...prev.messagesByGroup, ...fetchMoreResult.messagesByGroup],
                 });
