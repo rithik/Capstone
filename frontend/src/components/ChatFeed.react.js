@@ -44,7 +44,6 @@ function ChatFeed({
     const height = window.innerHeight * 0.86;
     const username = localStorage.getItem('username');
     const dataSource = messages.map(messagebox => {
-        console.log(messagebox);
         if (messagebox.cType === "text") {
             return {
                 position: messagebox.sender === username ? 'right' : 'left',
@@ -110,7 +109,6 @@ function ChatFeed({
                 lockable={true}
                 toBottomHeight={'86%'}
                 onDownload={(e) => {
-                    console.log(e); 
                     dataURLtoFile(e.data.uri, e.type === 'photo' ? e.data.filename : e.text)
                 }}
                 dataSource={dataSource}

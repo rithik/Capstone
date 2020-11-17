@@ -90,7 +90,6 @@ const resolvers = {
             } = context;
             const _ = verifyToken(token);
             const gid = args.gid;
-            console.log(args);
             const params = {
                 order: [
                     ['createdAt', 'DESC'],
@@ -160,7 +159,6 @@ const resolvers = {
             const dbUser = User.build(newUser);
             await dbUser.save();
             //debugging
-            console.log('dbuser', dbUser);
             return {
                 id: dbUser.dataValues.id,
                 username: dbUser.dataValues.username,
@@ -195,7 +193,6 @@ const resolvers = {
             return returnObj;
         },
         async createMessage(parent, args, context) {
-            console.log("Create message")
             const {
                 token
             } = context;
@@ -213,7 +210,6 @@ const resolvers = {
             };
             const dbMessage = Message.build(newMessage);
             await dbMessage.save();
-            console.log(dbMessage);
             const channel_name = `MESSAGE_GID_${args.group}`;
             const returnMessage = {
                 id: dbMessage.dataValues.id,
@@ -263,7 +259,6 @@ const resolvers = {
                 privateKey
             };
             const channel_name = `NEW_GROUP_${username}`;
-            console.log(channel_name);
             pubsub.publish(channel_name, {
                 newGroup: returnObj
             });
@@ -276,7 +271,6 @@ const resolvers = {
         },
         newGroup: {
             subscribe: (parent, args, context, info) => {
-                console.log(args);
                 return pubsub.asyncIterator([`NEW_GROUP_${args.username}`]);
             }
         },

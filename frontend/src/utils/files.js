@@ -17,7 +17,6 @@ import CryptoJS from "crypto-js";
 import { saveAs } from 'file-saver';
 
 export const convertFileToBase64 = (event, groupId, createMessage, username) => {
-    console.log(event.target.files[0]);
     if (event.target.files == null){
         return;
     }
@@ -32,7 +31,6 @@ export const convertFileToBase64 = (event, groupId, createMessage, username) => 
 }
 
 export function encryptFile(message, filename, groupId){
-    console.log(message)
     var messageJSON = {"content": message, "filename": filename};
     var messageString = JSON.stringify(messageJSON);
     const groupPrivateKey = localStorage.getItem(`${groupId}-privateKey`);

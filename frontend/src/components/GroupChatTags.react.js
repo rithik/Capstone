@@ -79,9 +79,6 @@ function GroupChatTags({ show, setShow }) {
                 createGroup({ variables: { users: tags, publicKey: publicKey, name: groupName } });
             });
         }
-        else {
-            console.log("Error, you have no individuals to add to the group")
-        }
     }
 
     return (

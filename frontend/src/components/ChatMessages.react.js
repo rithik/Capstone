@@ -8,7 +8,6 @@ import { css } from "@emotion/core";
 import ClipLoader from "react-spinners/ClipLoader";
 import ChatFeed from './ChatFeed.react';
 import { decryptMessage } from '../utils/AESEncryption';
-import { Message } from 'react-chat-ui';
 import 'react-chat-elements/dist/main.css';
 
 const GET_MESSAGES = gql`
@@ -47,7 +46,6 @@ function ChatMessages({
     selectedGroup, doneFetching, setDoneFetching
 }) {
     const [messages, setMessages] = useState([]);
-    console.log(selectedGroup);
     const { subscribeToMore, loading, error, data, fetchMore } = useQuery(
         GET_MESSAGES,
         {
@@ -62,7 +60,6 @@ function ChatMessages({
 
     useEffect(() => {
         const username = localStorage.getItem('username');
-        console.log(selectedGroup);
         if (data) {
             const reversedEntries = [].concat(data.messagesByGroup).reverse();
             const messageObjects = reversedEntries.map(message => {

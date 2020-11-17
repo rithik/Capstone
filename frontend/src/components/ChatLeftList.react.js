@@ -5,7 +5,6 @@ import {
   useQuery
 } from '@apollo/client';
 
-import { Avatar } from '@livechat/ui-kit'
 import { ChatList } from 'react-chat-elements'
 import 'react-chat-elements/dist/main.css';
 import './../App.css';
@@ -111,9 +110,8 @@ function ChatLeftList({ selectedGroup, setSelectedGroup, setDoneFetching, client
     }
   });
 
-  console.log(dataSource);
 
-  return (<ChatList onClick={(chat) => { console.log(chat); setSelectedGroup(chat.id); setDoneFetching(false);}}
+  return (<ChatList onClick={(chat) => { setSelectedGroup(chat.id); setDoneFetching(false);}}
     style={{
       backgroundColor: "#121212"
     }}

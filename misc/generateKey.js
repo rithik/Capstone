@@ -10,7 +10,6 @@ async function exportCryptoPublicKey(key) {
     const exportedAsString = ab2str(exported);
     const exportedAsBase64 = window.btoa(exportedAsString);
     const pemExported = `-----BEGIN PUBLIC KEY-----\n${exportedAsBase64}\n-----END PUBLIC KEY-----`;
-    console.log(pemExported);
     return pemExported;
 }
 
@@ -22,7 +21,6 @@ async function exportCryptoPrivateKey(key) {
     const exportedAsString = ab2str(exported);
     const exportedAsBase64 = window.btoa(exportedAsString);
     const pemExported = `-----BEGIN PRIVATE KEY-----\n${exportedAsBase64}\n-----END PRIVATE KEY-----`;
-    console.log(pemExported);
     return pemExported;
 }
 
@@ -44,5 +42,4 @@ window.crypto.subtle.generateKey({
     var crypt2 = new JSEncrypt();
     crypt2.setPrivateKey(privateKey);
     var dec = crypt2.decrypt(enc.toString());
-    console.log(dec);
 });

@@ -17,7 +17,6 @@ const createToken = async (username, publicKey) => {
             throw Error("username and public key are incorrect")
         }
         const token = jwt.sign({ username, publicKey }, "supersecret");
-        console.log('jwt token', token)
         return { token, username }
     } catch (e) {
         throw new AuthenticationError(

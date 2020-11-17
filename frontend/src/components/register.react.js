@@ -158,7 +158,6 @@ function Register() {
 
 	const loginUser = async () => {
 		const { data: userData } = await refetch({ username: loginUsername });
-		console.log(userData);
 		if (error) {
 			console.error(error);
 			setLoginError(true);
