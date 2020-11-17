@@ -104,7 +104,7 @@ function ChatFeed({
                 // />
             }
         </div>
-        <div style={{ maxHeight: height }}>
+        <div style={{ }}>
             <MessageList
                 className='message-list'
                 lockable={true}

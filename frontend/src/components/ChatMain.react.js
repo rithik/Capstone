@@ -93,6 +93,7 @@ const themes = {
 
 function ChatMain({ client }) {
     const inputEl = useRef(null);
+    const fileUploader = useRef(null);
     const username = localStorage.getItem('username');
     const [messageInput, setMessageInput] = useState("");
     const [createMessage] = useMutation(SEND_MESSAGE);
@@ -100,6 +101,7 @@ function ChatMain({ client }) {
     const [selectedGroup, setSelectedGroup] = useState(null);
     const [doneFetching, setDoneFetching] = useState(false)
     const [show, setShow] = useState(false);
+
 
     const logout = () => {
         localStorage.clear();
@@ -141,50 +143,68 @@ function ChatMain({ client }) {
                 top: 0,
                 overflowX: 'hidden',
                 right: 0,
-                border: "1px solid rgba(108, 117, 125, 0.1)",
+                borderLeft: "1px solid white",
             }}>
                 {
                     selectedGroup && (
                         <>
-                            <ChatMessages selectedGroup={selectedGroup} doneFetching={doneFetching} setDoneFetching={setDoneFetching} />
-                            <Input
-                                placeholder="Enter message"
-                                defaultValue=""
-                                ref={inputEl}
-                                multiline={true}
-                                // buttonsFloat='left'
-                                onKeyPress={(e) => {
-                                    if (e.shiftKey && e.charCode === 13) {
-                                        return true;
-                                    }
-                                    if (e.charCode === 13) {
-                                        createMessage({ variables: { username, gid: selectedGroup, content: encryptMessage(inputEl.current.input.value, "text", selectedGroup), cType: "text" } });
-                                        inputEl.current.clear();
-                                        e.preventDefault();
-                                        return false;
-                                    }
-                                }}
-                                rightButtons={
-                                    <input
-                                        // className={classes.input}
-                                        // style={{ display: 'none' }}
-                                        id="raised-button-file"
-                                        type="file"
-                                        onChange={(event, newValue) => {
-                                            console.log(event.target.files);
-                                            convertFileToBase64(event, selectedGroup, createMessage, username)
-                                            // createMessage({ variables: { username, gid: selectedGroup, content: convertFileToBase64(event, selectedGroup), cType: "file" } });
-                                            event.preventDefault();
-                                        }}
-                                    />
-                                    // <ChatButton
-                                    //     text='Send'
-                                    //     onClick={(e) => {
-                                    //         createMessage({ variables: { username, gid: selectedGroup, content: encryptMessage(inputEl.current.value, "text", selectedGroup), cType: "text" } });
-                                    //         inputEl.current.clear();
-                                    //         e.preventDefault();
-                                    //     }} />
-                                } />
+                        <div styles={{overflow:"hidden"}}>
+                            <div style = {{height:"90%", position:"relative",}}>
+                                <ChatMessages selectedGroup={selectedGroup} doneFetching={doneFetching} setDoneFetching={setDoneFetching} />
+                            </div>
+                            <div style = {{paddingLeft: "1px", height:"5%", bottom:"1%", position:"fixed", width:"68%"}}>
+                                <Input
+                                    placeholder="Enter message"
+                                    defaultValue=""
+                                    ref={inputEl}
+                                    multiline={true}
+                                    // buttonsFloat='left'
+                                    // maxHeight= {0}
+                                    // minHeight = {0}
+                                    // autoHeight = {false}
+                                    onKeyPress={(e) => {
+                                        if (e.shiftKey && e.charCode === 13) {
+                                            return true;
+                                        }
+                                        if (e.charCode === 13 && inputEl.current.input.value.trim()!=="") {
+                                            createMessage({ variables: { username, gid: selectedGroup, content: encryptMessage(inputEl.current.input.value, "text", selectedGroup), cType: "text" } });
+                                            inputEl.current.clear();
+                                            e.preventDefault();
+                                            return false;
+                                        }
+                                    }}
+                                    rightButtons={
+                                        <>
+                                            <input
+                                                id="raised-button-file"
+                                                style = {{display:"none"}}
+                                                type="file"
+                                                ref={fileUploader}
+                                                onChange={(event, newValue) => {
+                                                    console.log(event.target.files);
+                                                    convertFileToBase64(event, selectedGroup, createMessage, username)
+                                                    // createMessage({ variables: { username, gid: selectedGroup, content: convertFileToBase64(event, selectedGroup), cType: "file" } });
+                                                    event.preventDefault();
+                                                }}
+                                            />
+                                        <ChatButton text='Upload' onClick={()=>{fileUploader.current.click()}}>
+                                        </ChatButton>
+                                        <ChatButton
+                                        text='Send'
+                                        onClick={(e) => {
+                                            if(inputEl.current.input.value.trim()!==""){
+                                                createMessage({ variables: { username, gid: selectedGroup, content: encryptMessage(inputEl.current.input.value, "text", selectedGroup), cType: "text" } });
+                                                inputEl.current.clear();
+                                                e.preventDefault();
+                                            }
+                                        }} />
+                                    </>
+                                    } />
+                            </div>
+                        </div>
+
+                            
+                            
                             {/* <Form style={{ width: "68%", bottom: "20px", position: "fixed", marginLeft: '0', marginRight: '0', display: "block", left: "31%" }}>
                                 <Form.Group>
                                     <Form.Control type="text" placeholder="Enter message" value={messageInput} style={{backgroundColor: "#363636", color: "white", borderColor: "#363636"}} onChange={e => setMessageInput(e.target.value)} onKeyPress={event => {

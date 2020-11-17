@@ -13,7 +13,7 @@ To run server, run the following commands:
 
 ```bash
 cd backend-node
-node index
+nodemon index
 ```
 
 To run frontend, run the following commands:
