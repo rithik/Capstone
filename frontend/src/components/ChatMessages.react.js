@@ -9,6 +9,7 @@ import ClipLoader from "react-spinners/ClipLoader";
 import ChatFeed from './ChatFeed.react';
 import { decryptMessage } from '../utils/AESEncryption';
 import { Message } from 'react-chat-ui';
+import 'react-chat-elements/dist/main.css';
 
 const GET_MESSAGES = gql`
     query getMessagesForGroup($gid: Int!, $offset: Int, $limit: Int) {
@@ -46,6 +47,7 @@ function ChatMessages({
     selectedGroup, doneFetching, setDoneFetching
 }) {
     const [messages, setMessages] = useState([]);
+    console.log(selectedGroup);
     const { subscribeToMore, loading, error, data, fetchMore } = useQuery(
         GET_MESSAGES,
         {
@@ -54,19 +56,20 @@ function ChatMessages({
                 offset: 0,
                 limit: 50
             },
-            fetchPolicy: "cache-and-network"
+            fetchPolicy: "network"
         }
     );
 
     useEffect(() => {
         const username = localStorage.getItem('username');
-        if (messages.length === 0 && data) {
+        console.log(selectedGroup);
+        if (data) {
             const reversedEntries = [].concat(data.messagesByGroup).reverse();
             const messageObjects = reversedEntries.map(message => {
                 if (localStorage.getItem(`${selectedGroup}-privateKey`) == null || localStorage.getItem(`${selectedGroup}-privateKey`) === 'undefined') {
                     return null;
                 }
-                return new Message({ id: message.sender === username ? 0 : message.sender, message: decryptMessage(message.content, selectedGroup).message, senderName: `@${message.sender}` })
+                return { sender: message.sender, message: decryptMessage(message.content, selectedGroup).message, senderName: `@${message.sender}`, cType: message.cType, ts: message.ts };
             }).filter(Boolean);
             setMessages(messageObjects);
         }
@@ -74,10 +77,12 @@ function ChatMessages({
             document: MESSAGE_SUBSCRIPTION,
             variables: { gid: selectedGroup },
             updateQuery: (prev, { subscriptionData }) => {
-                if (!subscriptionData.data) return prev;
-                console.log(subscriptionData, selectedGroup);
+                if (!subscriptionData.data) {
+                    setDoneFetching(true);
+                    return prev;
+                }
                 const newFeedItem = subscriptionData.data.newMessage;
-                const newMessage = new Message({ id: newFeedItem.sender === username ? 0 : newFeedItem.sender, message: decryptMessage(newFeedItem.content, selectedGroup).message, senderName: `@${newFeedItem.sender}` });
+                const newMessage = { sender: newFeedItem.sender, message: decryptMessage(newFeedItem.content, selectedGroup).message, senderName: `@${newFeedItem.sender}`, cType: newFeedItem.cType, ts: newFeedItem.ts };
                 setMessages(messages => [...messages, newMessage]);
                 return Object.assign({}, prev, {
                     messagesByGroup: [newFeedItem, ...prev.messagesByGroup]
@@ -120,7 +125,7 @@ function ChatMessages({
                     if (localStorage.getItem(`${selectedGroup}-privateKey`) == null || localStorage.getItem(`${selectedGroup}-privateKey`) === 'undefined') {
                         return null;
                     }
-                    return new Message({ id: message.sender === username ? 0 : message.sender, message: decryptMessage(message.content, selectedGroup).message, senderName: `@${message.sender}` })
+                    return { sender: message.sender, message: decryptMessage(message.content, selectedGroup).message, senderName: `@${message.sender}`, cType: message.cType, ts: message.ts };
                 }).filter(Boolean);
                 setMessages(messages => [...messages, ...messageObjects]);
                 return Object.assign({}, prev, {

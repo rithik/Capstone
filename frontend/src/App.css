@@ -103,3 +103,30 @@ button {
 .tab-content {
   width: 70%;
 }
+
+.rce-citem {
+  background: none !important;
+}
+
+.notActiveChatLeft {
+  background-color: #121212 !important;
+  border-bottom: 1px white solid; 
+}
+
+.activeChatLeft {
+  background-color: #648dae !important;
+  border-bottom: 1px white solid; 
+}
+
+.rce-citem-body--top-time {
+  color: #121212 !important;
+}
+
+.rce-mbox-text {
+  color: #121212 !important;
+}
+
+.rce-mbox-title:hover {
+  text-decoration: none !important;
+  cursor: default !important;
+}

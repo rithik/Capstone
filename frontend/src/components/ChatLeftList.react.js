@@ -5,7 +5,11 @@ import {
   useQuery
 } from '@apollo/client';
 
-import { ChatList, ChatListItem, Avatar, Column, Row, Title, Subtitle } from '@livechat/ui-kit'
+import { Avatar } from '@livechat/ui-kit'
+import { ChatList } from 'react-chat-elements'
+import 'react-chat-elements/dist/main.css';
+import './../App.css';
+import 'react-chat-elements/dist/main.css';
 
 import { decryptMessageForPrivateKey } from '../utils/AESEncryption';
 
@@ -77,31 +81,43 @@ function ChatLeftList({ selectedGroup, setSelectedGroup, setDoneFetching, client
     return `Error! ${error.message}`;
   }
 
-  const groupDivs = data.groupsByUser.map(group => {
+  const stringToColor = (groupName) => {
+    var hash = 0;
+    for (var i = 0; i < groupName.length; i++) {
+      hash = groupName.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    var color = '#';
+    for (var i = 0; i < 3; i++) {
+      var value = (hash >> (i * 8)) & 0xFF;
+      color += ('00' + value.toString(16)).substr(-2);
+    }
+    return color;
+  }
+
+  const dataSource = data.groupsByUser.map(group => {
     if (localStorage.getItem(`${group.id}-privateKey`) == null || localStorage.getItem(`${group.id}-privateKey`) === 'undefined') {
       localStorage.setItem(`${group.id}-privateKey`, decryptMessageForPrivateKey(group.privateKey));
     }
     const users = group.users.map(user => `@${user.username}`);
-    return (
-      <div key={group.id} style={group.id === selectedGroup ? {backgroundColor: "#0275d8"} : {}} onClick={() => { setSelectedGroup(group.id); setDoneFetching(false) }}>
-        <ChatListItem active={group.id === selectedGroup}>
-          <Avatar letter={group.name.charAt(0).toUpperCase()} style={{color: '#121212'}}/>
-          <Column fill="true">
-            <Row justify>
-              <Title ellipsis>{group.name}</Title>
-            </Row>
-            <Row justify>
-              <Subtitle ellipsis>{users.join(", ")}</Subtitle>
-            </Row>
-          </Column>
-        </ChatListItem>
-      </div>
-    )
+    return {
+      letterItem: { letter: group.name.charAt(0).toUpperCase(), id: stringToColor(group.name) },
+      alt: group.name,
+      title: group.name,
+      subtitle: users.join(", "),
+      date: new Date(),
+      unread: 0,
+      id: group.id,
+      className: selectedGroup === group.id ? "activeChatLeft" : "notActiveChatLeft"
+    }
   });
 
-  return (<ChatList style={{ maxWidth: '100%' }}>
-    {groupDivs}
-  </ChatList>);
+  console.log(dataSource);
+
+  return (<ChatList onClick={(chat) => { console.log(chat); setSelectedGroup(chat.id); setDoneFetching(false);}}
+    style={{
+      backgroundColor: "#121212"
+    }}
+    dataSource={dataSource} />)
 }
 
 export default ChatLeftList;

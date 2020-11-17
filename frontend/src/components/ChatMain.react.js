@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import ChatLeftList from './ChatLeftList.react';
 import ChatMessages from './ChatMessages.react';
 import Button from 'react-bootstrap/Button';
@@ -8,12 +8,13 @@ import {
     useMutation
 } from '@apollo/client';
 import Avatar from 'react-avatar';
-
+import { Input, Button as ChatButton } from 'react-chat-elements'
 import { ThemeProvider, darkTheme, elegantTheme, purpleTheme, defaultTheme } from '@livechat/ui-kit'
 import GroupChatTags from './GroupChatTags.react';
 import Form from 'react-bootstrap/Form';
 import { encryptMessage } from '../utils/AESEncryption';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'react-chat-elements/dist/main.css';
 
 const SEND_MESSAGE = gql`
     mutation SendMessage($username: String!, $content: String!, $gid: Int!, $cType: String!){
@@ -90,7 +91,7 @@ const themes = {
 }
 
 function ChatMain({ client }) {
-    console.log(themes.darkTheme);
+    const inputEl = useRef(null);
     const username = localStorage.getItem('username');
     const [messageInput, setMessageInput] = useState("");
     const [createMessage] = useMutation(SEND_MESSAGE);
@@ -123,7 +124,7 @@ function ChatMain({ client }) {
                 <div style={{ verticalAlign: 'middle', fontSize: 24 }}>
                     <Avatar name={username} size={50} round style={{ marginBottom: 20, marginLeft: 25 }} title={`@${username}`} /> {`@${username}`}
                 </div>
-                <div className="App" style={{marginBottom: 10}}>
+                <div className="App" style={{ marginBottom: 10 }}>
                     <Button variant="primary" style={{ marginRight: "10px" }} onClick={() => setShow(!show)}>Create Group Chat</Button>
                     <Button variant="secondary" onClick={logout}>Logout</Button>
                 </div>
@@ -145,7 +146,33 @@ function ChatMain({ client }) {
                     selectedGroup && (
                         <>
                             <ChatMessages selectedGroup={selectedGroup} doneFetching={doneFetching} setDoneFetching={setDoneFetching} />
-                            <Form style={{ width: "68%", bottom: "20px", position: "fixed", marginLeft: '0', marginRight: '0', display: "block", left: "31%" }}>
+                            <Input
+                                placeholder="Enter message"
+                                defaultValue=""
+                                ref={inputEl}
+                                multiline={true}
+                                // buttonsFloat='left'
+                                onKeyPress={(e) => {
+                                    if (e.shiftKey && e.charCode === 13) {
+                                        return true;
+                                    }
+                                    if (e.charCode === 13) {
+                                        createMessage({ variables: { username, gid: selectedGroup, content: encryptMessage(inputEl.current.input.value, "text", selectedGroup), cType: "text" } });
+                                        inputEl.current.clear();
+                                        e.preventDefault();
+                                        return false;
+                                    }
+                                }}
+                                rightButtons={
+                                    <ChatButton
+                                        text='Send'
+                                        onClick={(e) => {
+                                            createMessage({ variables: { username, gid: selectedGroup, content: encryptMessage(inputEl.current.value, "text", selectedGroup), cType: "text" } });
+                                            inputEl.current.clear();
+                                            e.preventDefault();
+                                        }} />
+                                } />
+                            {/* <Form style={{ width: "68%", bottom: "20px", position: "fixed", marginLeft: '0', marginRight: '0', display: "block", left: "31%" }}>
                                 <Form.Group>
                                     <Form.Control type="text" placeholder="Enter message" value={messageInput} style={{backgroundColor: "#363636", color: "white", borderColor: "#363636"}} onChange={e => setMessageInput(e.target.value)} onKeyPress={event => {
                                         if (event.key === 'Enter' && event.target.value !== "") {
@@ -155,12 +182,12 @@ function ChatMain({ client }) {
                                         }
                                     }} />
                                 </Form.Group>
-                            </Form>
+                            </Form> */}
                         </>
                     )}
             </div>
         </ThemeProvider>
-    </div>);
+    </div >);
 }
 
 export default ChatMain;

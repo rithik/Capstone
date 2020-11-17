@@ -3,6 +3,9 @@ import { ChatFeed as ChatFeedUI } from 'react-chat-ui';
 import ClipLoader from "react-spinners/ClipLoader";
 import { css } from "@emotion/core";
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'react-chat-elements/dist/main.css';
+import { MessageList } from 'react-chat-elements'
+import 'react-chat-elements/dist/main.css';
 
 const override = css`
   display: block;
@@ -32,18 +35,32 @@ function ChatFeed({
                 // onLoadMore();
             }
         }, 1000);
-        return function cleanup(){
+        return function cleanup() {
             clearInterval(interval);
         }
     }, [onLoadMore, messagesStartRef, messagesEndRef]);
 
-    const height = window.innerHeight * 0.86
+    const height = window.innerHeight * 0.86;
+    const username = localStorage.getItem('username');
+    const dataSource = messages.map(message => {
+        if (message.cType === "text") {
+            return {
+                position: message.sender === username ? 'right' : 'left',
+                type: 'text',
+                text: message.message,
+                title: message.senderName,
+                date: new Date(parseInt(message.ts)),
+            };
+        }
+        return null;
+    }).filter(Boolean);
+
     return <div style={{ marginLeft: 5, marginRight: 5, marginBottom: 50 }}>
-        
+
         <div style={{ height: 30 }}
-            ref={(el) => { messagesStartRef = el; }}> 
+            ref={(el) => { messagesStartRef = el; }}>
             {
-                doneFetching ? <div/> : <ClipLoader
+                doneFetching ? <div /> : <ClipLoader
                     css={override}
                     size={30}
                     color={"#123abc"}
@@ -51,27 +68,12 @@ function ChatFeed({
                 />
             }
         </div>
-        <div style={{maxHeight: height}}>
-            <ChatFeedUI
-                maxHeight = {height}                
-                messages={messages}
-                showSenderName
-                bubblesCentered={false}
-                bubbleStyles={
-                    {
-                        text: {
-                            fontSize: 14
-                        },
-                        chatbubble: {
-                            borderRadius: 30,
-                            padding: 15, 
-                            backgroundColor: "#363636"
-                        }, 
-                        userBubble: {
-                            backgroundColor: '#0084ff', 
-                        }
-                    }
-                }
+        <div style={{ maxHeight: height }}>
+            <MessageList
+                className='message-list'
+                lockable={true}
+                toBottomHeight={'86%'}
+                dataSource={dataSource}
             />
         </div>
         <div style={{ float: "left", clear: "both" }}
