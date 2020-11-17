@@ -69,7 +69,7 @@ function ChatMessages({
                 if (localStorage.getItem(`${selectedGroup}-privateKey`) == null || localStorage.getItem(`${selectedGroup}-privateKey`) === 'undefined') {
                     return null;
                 }
-                return { sender: message.sender, message: decryptMessage(message.content, selectedGroup).message, senderName: `@${message.sender}`, cType: message.cType, ts: message.ts };
+                return { sender: message.sender, message: decryptMessage(message.content, selectedGroup), senderName: `@${message.sender}`, cType: message.cType, ts: message.ts };
             }).filter(Boolean);
             setMessages(messageObjects);
         }
@@ -82,7 +82,7 @@ function ChatMessages({
                     return prev;
                 }
                 const newFeedItem = subscriptionData.data.newMessage;
-                const newMessage = { sender: newFeedItem.sender, message: decryptMessage(newFeedItem.content, selectedGroup).message, senderName: `@${newFeedItem.sender}`, cType: newFeedItem.cType, ts: newFeedItem.ts };
+                const newMessage = { sender: newFeedItem.sender, message: decryptMessage(newFeedItem.content, selectedGroup), senderName: `@${newFeedItem.sender}`, cType: newFeedItem.cType, ts: newFeedItem.ts };
                 setMessages(messages => [...messages, newMessage]);
                 return Object.assign({}, prev, {
                     messagesByGroup: [newFeedItem, ...prev.messagesByGroup]
@@ -125,7 +125,7 @@ function ChatMessages({
                     if (localStorage.getItem(`${selectedGroup}-privateKey`) == null || localStorage.getItem(`${selectedGroup}-privateKey`) === 'undefined') {
                         return null;
                     }
-                    return { sender: message.sender, message: decryptMessage(message.content, selectedGroup).message, senderName: `@${message.sender}`, cType: message.cType, ts: message.ts };
+                    return { sender: message.sender, message: decryptMessage(message.content, selectedGroup), senderName: `@${message.sender}`, cType: message.cType, ts: message.ts };
                 }).filter(Boolean);
                 setMessages(messages => [...messages, ...messageObjects]);
                 return Object.assign({}, prev, {

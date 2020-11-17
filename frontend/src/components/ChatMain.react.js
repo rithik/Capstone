@@ -15,6 +15,7 @@ import Form from 'react-bootstrap/Form';
 import { encryptMessage } from '../utils/AESEncryption';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-chat-elements/dist/main.css';
+import {convertFileToBase64} from './../utils/files';
 
 const SEND_MESSAGE = gql`
     mutation SendMessage($username: String!, $content: String!, $gid: Int!, $cType: String!){
@@ -164,13 +165,25 @@ function ChatMain({ client }) {
                                     }
                                 }}
                                 rightButtons={
-                                    <ChatButton
-                                        text='Send'
-                                        onClick={(e) => {
-                                            createMessage({ variables: { username, gid: selectedGroup, content: encryptMessage(inputEl.current.value, "text", selectedGroup), cType: "text" } });
-                                            inputEl.current.clear();
-                                            e.preventDefault();
-                                        }} />
+                                    <input
+                                        // className={classes.input}
+                                        // style={{ display: 'none' }}
+                                        id="raised-button-file"
+                                        type="file"
+                                        onChange={(event, newValue) => {
+                                            console.log(event.target.files);
+                                            convertFileToBase64(event, selectedGroup, createMessage, username)
+                                            // createMessage({ variables: { username, gid: selectedGroup, content: convertFileToBase64(event, selectedGroup), cType: "file" } });
+                                            event.preventDefault();
+                                        }}
+                                    />
+                                    // <ChatButton
+                                    //     text='Send'
+                                    //     onClick={(e) => {
+                                    //         createMessage({ variables: { username, gid: selectedGroup, content: encryptMessage(inputEl.current.value, "text", selectedGroup), cType: "text" } });
+                                    //         inputEl.current.clear();
+                                    //         e.preventDefault();
+                                    //     }} />
                                 } />
                             {/* <Form style={{ width: "68%", bottom: "20px", position: "fixed", marginLeft: '0', marginRight: '0', display: "block", left: "31%" }}>
                                 <Form.Group>

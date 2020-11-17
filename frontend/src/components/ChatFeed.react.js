@@ -6,6 +6,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-chat-elements/dist/main.css';
 import { MessageList } from 'react-chat-elements'
 import 'react-chat-elements/dist/main.css';
+import {dataURLtoFile} from './../utils/files';
 
 const override = css`
   display: block;
@@ -42,14 +43,49 @@ function ChatFeed({
 
     const height = window.innerHeight * 0.86;
     const username = localStorage.getItem('username');
-    const dataSource = messages.map(message => {
-        if (message.cType === "text") {
+    const dataSource = messages.map(messagebox => {
+        console.log(messagebox);
+        if (messagebox.cType === "text") {
             return {
-                position: message.sender === username ? 'right' : 'left',
+                position: messagebox.sender === username ? 'right' : 'left',
                 type: 'text',
-                text: message.message,
-                title: message.senderName,
-                date: new Date(parseInt(message.ts)),
+                text: messagebox.message.message,
+                title: messagebox.senderName,
+                date: new Date(parseInt(messagebox.ts)),
+            };
+        }
+        if (messagebox.cType === "photo") {
+            return {
+                position: messagebox.sender === username ? 'right' : 'left',
+                type: 'photo',
+                title: messagebox.senderName,
+                date: new Date(parseInt(messagebox.ts)),
+                data: {
+                    uri: messagebox.message.content,
+                    filename: messagebox.message.filename,
+                    status: {
+                        click: false,
+                        loading: 0,
+                    },
+                    width: "300px",
+                    height: "150px"
+                }
+            };
+        }
+        if (messagebox.cType === "file") {
+            return {
+                position: messagebox.sender === username ? 'right' : 'left',
+                type: 'file',
+                text: messagebox.message.filename,
+                title: messagebox.senderName,
+                date: new Date(parseInt(messagebox.ts)),
+                data: {
+                    uri: messagebox.message.content,
+                    status: {
+                        click: false,
+                        loading: 0,
+                    }
+                }
             };
         }
         return null;
@@ -60,12 +96,12 @@ function ChatFeed({
         <div style={{ height: 30 }}
             ref={(el) => { messagesStartRef = el; }}>
             {
-                doneFetching ? <div /> : <ClipLoader
-                    css={override}
-                    size={30}
-                    color={"#123abc"}
-                    loading={true}
-                />
+                // doneFetching ? <div /> : <ClipLoader
+                //     css={override}
+                //     size={30}
+                //     color={"#123abc"}
+                //     loading={true}
+                // />
             }
         </div>
         <div style={{ maxHeight: height }}>
@@ -73,6 +109,10 @@ function ChatFeed({
                 className='message-list'
                 lockable={true}
                 toBottomHeight={'86%'}
+                onDownload={(e) => {
+                    console.log(e); 
+                    dataURLtoFile(e.data.uri, e.type === 'photo' ? e.data.filename : e.text)
+                }}
                 dataSource={dataSource}
             />
         </div>

@@ -42,13 +42,26 @@ const server = new ApolloServer({
             console.log('websocket disconnect');
         },
     },
+    uploads: {
+        maxFieldSize: 1000000, //bytes = 50MB
+        maxFileSize: 1000000,
+        maxFiles: 10
+    }
 });
 
 const app = express();
 app.use(cors());
 
 server.applyMiddleware({
-    app
+    app, 
+    bodyParserConfig: {
+        limit: '1mb',
+    },
+    route: {
+        payload: {
+            maxBytes: 1000000,
+        },
+    },
 });
 
 const httpServer = http.createServer(app);
