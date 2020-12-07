@@ -192,6 +192,26 @@ const resolvers = {
             // });
             return returnObj;
         },
+        async addGroupMember(parent, args, context) {
+            const {
+                token
+            } = context;
+            const _ = verifyToken(token);
+            const dbGroup = await Group.findOne({
+                where: {
+                    id: args.gid
+                }
+            });
+            const setupUsers = await addUserstoGroup(args.users, args.gid);
+            const userObjs = await getUsersByUsernames(args.users);
+            const returnObj = {
+                id: dbGroup.dataValues.id,
+                name: dbGroup.dataValues.name,
+                publicKey: dbGroup.dataValues.publicKey,
+                users: userObjs,
+            };
+            return returnObj;
+        },
         async createMessage(parent, args, context) {
             const {
                 token

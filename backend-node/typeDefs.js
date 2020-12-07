@@ -86,6 +86,10 @@ const typeDefs = gql `
             users: [String!], 
             publicKey: String!,
         ): GroupOut
+        addGroupMember(
+            gid: Int!
+            users: [String!]
+        ): GroupOut
         createMessage( 
             content: String!
             group: Int!, 

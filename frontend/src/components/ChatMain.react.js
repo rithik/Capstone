@@ -15,6 +15,7 @@ import { encryptMessage } from '../utils/AESEncryption';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-chat-elements/dist/main.css';
 import {convertFileToBase64} from './../utils/files';
+import AddGroupMember from './AddGroupMember.react';
 
 const SEND_MESSAGE = gql`
     mutation SendMessage($username: String!, $content: String!, $gid: Int!, $cType: String!){
@@ -100,6 +101,7 @@ function ChatMain({ client }) {
     const [selectedGroup, setSelectedGroup] = useState(null);
     const [doneFetching, setDoneFetching] = useState(false)
     const [show, setShow] = useState(false);
+    const [showAdd, setShowAdd] = useState(false);
 
 
     const logout = () => {
@@ -112,6 +114,7 @@ function ChatMain({ client }) {
 
     return (<div className="main">
         <GroupChatTags show={show} setShow={setShow} />
+        <AddGroupMember show={showAdd} setShow={setShowAdd} groupId={selectedGroup}/>
         <ThemeProvider theme={themes.darkTheme}>
             <div style={{
                 height: "100%",
@@ -127,6 +130,7 @@ function ChatMain({ client }) {
                     <Avatar name={username} size={50} round style={{ marginBottom: 20, marginLeft: 25 }} title={`@${username}`} /> {`@${username}`}
                 </div>
                 <div className="App" style={{ marginBottom: 10 }}>
+                    {selectedGroup && <Button variant="primary" style={{ marginRight: "10px" }} onClick={() => setShowAdd(!showAdd)}>Add Member to Chat</Button>}
                     <Button variant="primary" style={{ marginRight: "10px" }} onClick={() => setShow(!show)}>Create Group Chat</Button>
                     <Button variant="secondary" onClick={logout}>Logout</Button>
                 </div>
